@@ -5,21 +5,31 @@ import { useCallback } from 'react';
 import { InteractionManager, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ChipRow } from '@/components/chip-row';
 import { ScreenHeader } from '@/components/screen-header';
 import { centsColor, IN_TUNE_CENTS, TunerGauge } from '@/components/tuner-gauge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { OPEN_STRINGS } from '@/music/notes';
-import { useSettings } from '@/state/settings';
+import { midiToLabel, OPEN_STRINGS } from '@/music/notes';
+import { useDrone } from '@/state/drone';
+import { useSettings, type TuningMode } from '@/state/settings';
 import { useTuner } from '@/state/tuner';
+
+const MODE_OPTIONS: { value: TuningMode; label: string }[] = [
+  { value: 'equal', label: 'Equal' },
+  { value: 'just', label: 'Just (vs drone)' },
+];
 
 export default function TunerScreen() {
   useKeepAwake();
   const theme = useTheme();
-  const { note, cents, permission, start, stop } = useTuner();
+  const { note, cents, justRoot, permission, start, stop } = useTuner();
   const a4 = useSettings((s) => s.a4);
+  const tuningMode = useSettings((s) => s.tuningMode);
+  const setTuningMode = useSettings((s) => s.setTuningMode);
+  const dronePlaying = useDrone((s) => s.playing);
 
   // Listen while the screen is focused, release the mic when leaving.
   // Mic startup is deferred past the tab transition so switching stays smooth.
@@ -42,7 +52,25 @@ export default function TunerScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ScreenHeader icon="gauge" title="Tuner" subtitle={`A = ${a4} Hz`} />
+        <ScreenHeader
+          icon="gauge"
+          title="Tuner"
+          subtitle={
+            justRoot !== null
+              ? `A = ${a4} Hz · just intervals vs ${midiToLabel(justRoot)}`
+              : `A = ${a4} Hz · equal temperament`
+          }
+        />
+
+        <View style={styles.modeRow}>
+          <ChipRow options={MODE_OPTIONS} selected={tuningMode} onSelect={setTuningMode} />
+          {tuningMode === 'just' && !dronePlaying && (
+            <ThemedText type="small" themeColor="textSecondary">
+              Start a drone — just intervals are measured against its root. Using equal
+              temperament until then.
+            </ThemedText>
+          )}
+        </View>
 
         {permission === 'denied' ? (
           <View style={styles.center}>
@@ -134,6 +162,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.five,
     paddingBottom: Spacing.six,
+  },
+  modeRow: {
+    gap: Spacing.two,
   },
   centerText: {
     textAlign: 'center',
