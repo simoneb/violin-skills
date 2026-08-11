@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenHeader } from '@/components/screen-header';
 import { centsColor, IN_TUNE_CENTS, TunerGauge } from '@/components/tuner-gauge';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -37,12 +38,7 @@ export default function TunerScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <ThemedText type="subtitle">Tuner</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            A = {a4} Hz
-          </ThemedText>
-        </View>
+        <ScreenHeader icon="gauge" title="Tuner" subtitle={`A = ${a4} Hz`} />
 
         {permission === 'denied' ? (
           <View style={styles.center}>
@@ -124,9 +120,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
     gap: Spacing.four,
-  },
-  header: {
-    gap: Spacing.half,
   },
   center: {
     flex: 1,

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Subdivision } from '@/audio/metronome';
 import { BeatDot } from '@/components/beat-dot';
 import { PressableScale } from '@/components/pressable-scale';
+import { ScreenHeader } from '@/components/screen-header';
 import { ChipRow } from '@/components/chip-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -43,68 +44,79 @@ export default function MetronomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ThemedText type="subtitle">Metronome</ThemedText>
+        <ScreenHeader
+          icon="metronome"
+          title="Metronome"
+          subtitle={`${bpm} BPM · ${tempoMarking(bpm)}`}
+        />
 
-        {/* BPM display */}
-        <View style={styles.bpmDisplay}>
-          <ThemedText style={styles.bpmValue}>{bpm}</ThemedText>
-          <ThemedText themeColor="textSecondary">
-            BPM · {tempoMarking(bpm)}
-          </ThemedText>
-        </View>
+        {/* Tempo card: BPM display, beat dots, slider */}
+        <ThemedView
+          type="backgroundElement"
+          style={[styles.card, { borderColor: theme.border }]}>
+          <View style={styles.bpmDisplay}>
+            <ThemedText style={styles.bpmValue}>{bpm}</ThemedText>
+            <ThemedText themeColor="textSecondary">
+              BPM · {tempoMarking(bpm)}
+            </ThemedText>
+          </View>
 
-        {/* Beat indicator */}
-        <View style={styles.beatRow}>
-          {Array.from({ length: beatsPerBar }, (_, i) => (
-            <BeatDot
-              key={i}
-              active={playing && i === currentBeat}
-              color={i === 0 ? theme.tint : theme.text}
-              idleColor={theme.backgroundSelected}
+          <View style={styles.beatRow}>
+            {Array.from({ length: beatsPerBar }, (_, i) => (
+              <BeatDot
+                key={i}
+                active={playing && i === currentBeat}
+                color={i === 0 ? theme.tint : theme.text}
+                idleColor={theme.backgroundSelected}
+              />
+            ))}
+          </View>
+
+          <View style={styles.bpmControls}>
+            <PressableScale
+              onPress={() => setBpm(bpm - 1)}
+              pressedScale={0.88}
+              style={{ ...styles.stepButton, backgroundColor: theme.background, borderColor: theme.border }}>
+              <MaterialCommunityIcons name="minus" size={24} color={theme.text} />
+            </PressableScale>
+            <Slider
+              style={styles.slider}
+              minimumValue={MIN_BPM}
+              maximumValue={MAX_BPM}
+              step={1}
+              value={bpm}
+              onValueChange={setBpm}
+              minimumTrackTintColor={theme.tint}
+              maximumTrackTintColor={theme.backgroundSelected}
+              thumbTintColor={theme.tint}
             />
-          ))}
-        </View>
+            <PressableScale
+              onPress={() => setBpm(bpm + 1)}
+              pressedScale={0.88}
+              style={{ ...styles.stepButton, backgroundColor: theme.background, borderColor: theme.border }}>
+              <MaterialCommunityIcons name="plus" size={24} color={theme.text} />
+            </PressableScale>
+          </View>
+        </ThemedView>
 
-        {/* BPM controls */}
-        <View style={styles.bpmControls}>
-          <PressableScale
-            onPress={() => setBpm(bpm - 1)}
-            pressedScale={0.88}
-            style={{ ...styles.stepButton, backgroundColor: theme.backgroundElement, borderColor: theme.border }}>
-            <MaterialCommunityIcons name="minus" size={24} color={theme.text} />
-          </PressableScale>
-          <Slider
-            style={styles.slider}
-            minimumValue={MIN_BPM}
-            maximumValue={MAX_BPM}
-            step={1}
-            value={bpm}
-            onValueChange={setBpm}
-            minimumTrackTintColor={theme.tint}
-            maximumTrackTintColor={theme.backgroundSelected}
-            thumbTintColor={theme.tint}
-          />
-          <PressableScale
-            onPress={() => setBpm(bpm + 1)}
-            pressedScale={0.88}
-            style={{ ...styles.stepButton, backgroundColor: theme.backgroundElement, borderColor: theme.border }}>
-            <MaterialCommunityIcons name="plus" size={24} color={theme.text} />
-          </PressableScale>
-        </View>
+        {/* Rhythm card: time signature + subdivision */}
+        <ThemedView
+          type="backgroundElement"
+          style={[styles.card, { borderColor: theme.border }]}>
+          <View style={styles.section}>
+            <ThemedText type="smallBold" themeColor="textSecondary">
+              TIME SIGNATURE
+            </ThemedText>
+            <ChipRow options={TIME_SIGNATURES} selected={beatsPerBar} onSelect={setBeatsPerBar} />
+          </View>
 
-        <View style={styles.section}>
-          <ThemedText type="smallBold" themeColor="textSecondary">
-            TIME SIGNATURE
-          </ThemedText>
-          <ChipRow options={TIME_SIGNATURES} selected={beatsPerBar} onSelect={setBeatsPerBar} />
-        </View>
-
-        <View style={styles.section}>
-          <ThemedText type="smallBold" themeColor="textSecondary">
-            SUBDIVISION
-          </ThemedText>
-          <ChipRow options={SUBDIVISIONS} selected={subdivision} onSelect={setSubdivision} />
-        </View>
+          <View style={styles.section}>
+            <ThemedText type="smallBold" themeColor="textSecondary">
+              SUBDIVISION
+            </ThemedText>
+            <ChipRow options={SUBDIVISIONS} selected={subdivision} onSelect={setSubdivision} />
+          </View>
+        </ThemedView>
 
         <View style={styles.spacer} />
 
@@ -146,6 +158,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
     gap: Spacing.four,
+  },
+  card: {
+    gap: Spacing.four,
+    padding: Spacing.four,
+    borderRadius: Spacing.three,
+    borderWidth: 1,
   },
   bpmDisplay: {
     alignItems: 'center',

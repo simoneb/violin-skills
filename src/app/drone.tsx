@@ -5,6 +5,7 @@ import { StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PressableScale } from '@/components/pressable-scale';
+import { ScreenHeader } from '@/components/screen-header';
 
 import { setMasterVolume } from '@/audio/engine';
 import { ChipRow } from '@/components/chip-row';
@@ -34,12 +35,11 @@ export default function DroneScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <View style={styles.header}>
-          <ThemedText type="subtitle">Drone</ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            {midiToLabel(midi)} · {midiToFrequency(midi, a4).toFixed(1)} Hz · A={a4}
-          </ThemedText>
-        </View>
+        <ScreenHeader
+          icon="sine-wave"
+          title="Drone"
+          subtitle={`${midiToLabel(midi)} · ${midiToFrequency(midi, a4).toFixed(1)} Hz · A=${a4}`}
+        />
 
         {/* Open-string presets */}
         <View style={styles.section}>
@@ -175,9 +175,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.four,
     gap: Spacing.three,
-  },
-  header: {
-    gap: Spacing.half,
   },
   section: {
     gap: Spacing.two,

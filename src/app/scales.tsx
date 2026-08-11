@@ -6,6 +6,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PressableScale } from '@/components/pressable-scale';
+import { ScreenHeader } from '@/components/screen-header';
 
 import { centsColor, IN_TUNE_CENTS } from '@/components/tuner-gauge';
 import { ChipRow } from '@/components/chip-row';
@@ -80,12 +81,11 @@ export default function ScalesScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <View style={styles.header}>
-            <ThemedText type="subtitle">Scales</ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              {midiToLabel(tonicMidi, flats)} {SCALE_LABELS[scaleType].toLowerCase()} · 2 octaves
-            </ThemedText>
-          </View>
+          <ScreenHeader
+            icon="music-clef-treble"
+            title="Scales"
+            subtitle={`${midiToLabel(tonicMidi, flats)} ${SCALE_LABELS[scaleType].toLowerCase()} · 2 octaves`}
+          />
 
           <View style={styles.section}>
             <ThemedText type="smallBold" themeColor="textSecondary">
@@ -178,9 +178,6 @@ const styles = StyleSheet.create({
   scroll: {
     gap: Spacing.four,
     paddingBottom: Spacing.four,
-  },
-  header: {
-    gap: Spacing.half,
   },
   section: {
     gap: Spacing.two,

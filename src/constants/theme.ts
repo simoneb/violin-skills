@@ -9,14 +9,14 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#1A1D21',
-    background: '#FAF9F7',
-    backgroundElement: '#F0EEE9',
-    backgroundSelected: '#E3E0D8',
-    textSecondary: '#6B7078',
+    text: '#1A1D23',
+    background: '#FAFAFC',
+    backgroundElement: '#F0F1F5',
+    backgroundSelected: '#E2E4EC',
+    textSecondary: '#676D79',
     /** Subtle card/hairline borders. */
-    border: '#E7E4DD',
-    tint: '#B4632C',
+    border: '#E6E8EF',
+    tint: '#4F46E5',
     /** In tune / good intonation. */
     success: '#1E8E3E',
     /** Slightly off (5–15 cents). */
@@ -32,7 +32,7 @@ export const Colors = {
     textSecondary: '#9BA1AB',
     /** Subtle card/hairline borders. */
     border: '#22262E',
-    tint: '#E8A05C',
+    tint: '#8B93F8',
     /** In tune / good intonation. */
     success: '#4ADE80',
     /** Slightly off (5–15 cents). */

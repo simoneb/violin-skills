@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import { StyleSheet, useColorScheme, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 
@@ -24,9 +24,12 @@ export default function AppTabs() {
         headerShown: false,
         tabBarActiveTintColor: colors.tint,
         tabBarInactiveTintColor: colors.textSecondary,
+        tabBarLabelStyle: styles.label,
         tabBarStyle: {
           backgroundColor: colors.background,
-          borderTopColor: colors.backgroundElement,
+          borderTopColor: colors.border,
+          height: 64,
+          paddingTop: 6,
         },
       }}>
       {TABS.map((tab) => (
@@ -35,8 +38,14 @@ export default function AppTabs() {
           name={tab.name}
           options={{
             title: tab.title,
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name={tab.icon} size={size} color={color} />
+            tabBarIcon: ({ color, focused }) => (
+              <View
+                style={[
+                  styles.iconPill,
+                  focused && { backgroundColor: colors.tint + '22' },
+                ]}>
+                <MaterialCommunityIcons name={tab.icon} size={22} color={color} />
+              </View>
             ),
           }}
         />
@@ -47,3 +56,17 @@ export default function AppTabs() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  label: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  iconPill: {
+    width: 52,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
