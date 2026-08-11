@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { InteractionManager, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChipRow } from '@/components/chip-row';
@@ -41,14 +41,18 @@ export default function HomeScreen() {
   const [trend, setTrend] = useState<{ day: string; avgAbsError: number }[]>([]);
   const [trouble, setTrouble] = useState<{ pitchClass: number; avgAbsError: number }[]>([]);
 
-  // Refresh stats every time Home regains focus.
+  // Refresh stats every time Home regains focus — deferred past the tab
+  // transition (the queries are synchronous SQLite calls on the JS thread).
   useFocusEffect(
     useCallback(() => {
-      const weekAgo = Date.now() - 7 * 86400_000;
-      setStreak(currentStreak());
-      setWeekUsage(usageByTool(weekAgo));
-      setTrend(intonationTrend(30));
-      setTrouble(troubleNotes(weekAgo).slice(0, 3));
+      const task = InteractionManager.runAfterInteractions(() => {
+        const weekAgo = Date.now() - 7 * 86400_000;
+        setStreak(currentStreak());
+        setWeekUsage(usageByTool(weekAgo));
+        setTrend(intonationTrend(30));
+        setTrouble(troubleNotes(weekAgo).slice(0, 3));
+      });
+      return () => task.cancel();
     }, []),
   );
 
