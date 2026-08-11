@@ -1,0 +1,212 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Slider from '@react-native-community/slider';
+import { useKeepAwake } from 'expo-keep-awake';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { setMasterVolume } from '@/audio/engine';
+import { ChipRow } from '@/components/chip-row';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
+import { midiToFrequency, midiToLabel, NOTE_NAMES_SHARP, OPEN_STRINGS, pitchClass } from '@/music/notes';
+import { useDrone } from '@/state/drone';
+import { useSettings } from '@/state/settings';
+
+const OCTAVES = [2, 3, 4, 5].map((o) => ({ value: o, label: String(o) }));
+
+export default function DroneScreen() {
+  useKeepAwake();
+  const theme = useTheme();
+  const { playing, midi, withFifth, toggle, setMidi, setFifth } = useDrone();
+  const { a4, volume, setVolume } = useSettings();
+
+  const selectedPitchClass = pitchClass(midi);
+  const selectedOctave = Math.floor(midi / 12) - 1;
+
+  const selectNote = (pc: number, octave: number) => {
+    setMidi((octave + 1) * 12 + pc);
+  };
+
+  return (
+    <ThemedView style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <ThemedText type="subtitle">Drone</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {midiToLabel(midi)} · {midiToFrequency(midi, a4).toFixed(1)} Hz · A={a4}
+          </ThemedText>
+        </View>
+
+        {/* Open-string presets */}
+        <View style={styles.section}>
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            OPEN STRINGS
+          </ThemedText>
+          <View style={styles.presetRow}>
+            {OPEN_STRINGS.map((s) => {
+              const active = midi === s.midi;
+              return (
+                <Pressable
+                  key={s.name}
+                  onPress={() => setMidi(s.midi)}
+                  style={[
+                    styles.preset,
+                    { backgroundColor: active ? theme.tint : theme.backgroundElement },
+                  ]}>
+                  <ThemedText
+                    type="subtitle"
+                    style={{ color: active ? theme.background : theme.text }}>
+                    {s.name}
+                  </ThemedText>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Chromatic note grid */}
+        <View style={styles.section}>
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            NOTE
+          </ThemedText>
+          <View style={styles.noteGrid}>
+            {NOTE_NAMES_SHARP.map((name, pc) => {
+              const active = pc === selectedPitchClass;
+              return (
+                <Pressable
+                  key={name}
+                  onPress={() => selectNote(pc, selectedOctave)}
+                  style={[
+                    styles.noteButton,
+                    { backgroundColor: active ? theme.tint : theme.backgroundElement },
+                  ]}>
+                  <ThemedText
+                    type="smallBold"
+                    style={{ color: active ? theme.background : theme.text }}>
+                    {name}
+                  </ThemedText>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Octave */}
+        <View style={styles.section}>
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            OCTAVE
+          </ThemedText>
+          <ChipRow
+            options={OCTAVES}
+            selected={selectedOctave}
+            onSelect={(octave) => selectNote(selectedPitchClass, octave)}
+          />
+        </View>
+
+        {/* Fifth toggle */}
+        <View style={[styles.section, styles.rowBetween]}>
+          <ThemedText>Add fifth ({midiToLabel(midi + 7)})</ThemedText>
+          <Switch
+            value={withFifth}
+            onValueChange={setFifth}
+            trackColor={{ true: theme.tint }}
+          />
+        </View>
+
+        {/* Volume */}
+        <View style={styles.section}>
+          <ThemedText type="smallBold" themeColor="textSecondary">
+            VOLUME
+          </ThemedText>
+          <Slider
+            minimumValue={0}
+            maximumValue={1}
+            value={volume}
+            onValueChange={(v) => {
+              setVolume(v);
+              setMasterVolume(v);
+            }}
+            minimumTrackTintColor={theme.tint}
+            maximumTrackTintColor={theme.backgroundSelected}
+            thumbTintColor={theme.tint}
+          />
+        </View>
+
+        <View style={styles.spacer} />
+
+        {/* Play / stop */}
+        <Pressable
+          onPress={toggle}
+          style={[styles.playButton, { backgroundColor: playing ? theme.error : theme.tint }]}>
+          <MaterialCommunityIcons
+            name={playing ? 'stop' : 'play'}
+            size={40}
+            color={theme.background}
+          />
+        </Pressable>
+      </SafeAreaView>
+    </ThemedView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  safeArea: {
+    flex: 1,
+    maxWidth: MaxContentWidth,
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.four,
+    gap: Spacing.three,
+  },
+  header: {
+    gap: Spacing.half,
+  },
+  section: {
+    gap: Spacing.two,
+  },
+  rowBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  presetRow: {
+    flexDirection: 'row',
+    gap: Spacing.two,
+  },
+  preset: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+    borderRadius: Spacing.three,
+  },
+  noteGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.two,
+  },
+  noteButton: {
+    width: '15%',
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.three,
+    borderRadius: Spacing.two,
+  },
+  spacer: {
+    flex: 1,
+  },
+  playButton: {
+    alignSelf: 'center',
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: Spacing.five,
+  },
+});

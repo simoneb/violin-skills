@@ -1,56 +1,68 @@
-# Welcome to your Expo app 👋
+# Violin Skills
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile practice companion for violinists: drones, tuner, metronome, scales with live
+pitch feedback, an intonation trainer and an automatic practice journal.
 
-## Get started
+Built with Expo (React Native) + TypeScript. The audio engine uses
+[`react-native-audio-api`](https://github.com/software-mansion/react-native-audio-api)
+(Web Audio API spec), so drone/metronome synthesis and mic capture follow the web
+standard — which keeps an eventual web target cheap.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- **Drone** — 12 chromatic roots × octaves 2–5, open-string presets (G/D/A/E),
+  optional perfect fifth, soft string/organ timbre with a slow breathing LFO.
+  Keeps playing with the screen locked (Android foreground service).
+- **Tuner** — McLeod pitch method (via `pitchy`) on live mic buffers, ~40 readings/s,
+  median spike filter + EMA-smoothed needle, open-string quick check.
+- **Metronome** — lookahead scheduling on the audio clock (sample-accurate),
+  30–240 BPM, tap tempo, time signatures, subdivisions, accented downbeats.
+  Runs simultaneously with the drone.
+- **Scales** — key + scale/arpeggio picker, tonic drone one tap away, live
+  highlighting of the note you're playing with sharp/flat color coding.
+- **Intonation trainer** — 10 target notes per session (open strings / 1st position /
+  all positions), hold each note ~1 s, scored in cents (accuracy + steadiness),
+  results persisted.
+- **Practice journal** — tool usage is logged automatically; Home shows the day
+  streak, weekly time per tool, latest intonation score and trouble notes.
+- **A4 calibration** (415–444 Hz) shared by every tool.
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Development
 
 ```bash
-npm run reset-project
+npm install
+npm run android        # build + install on a connected Android device
+npm test               # unit tests (music-theory core)
+npm run typecheck
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The native build is required (dev client, not Expo Go) because of
+`react-native-audio-api`. For iterating on JS/TS only, `npx expo start` and press
+`a` once the dev build is installed.
 
-### Other setup steps
+### Windows build notes
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- Gradle needs a JDK: set `JAVA_HOME` to Android Studio's bundled JBR
+  (`C:\Program Files\Android\Android Studio\jbr`) or install a JDK 17+.
+- `android/local.properties` must point at the Android SDK
+  (`sdk.dir=C:\\Users\\<you>\\AppData\\Local\\Android\\Sdk`).
+- `react-native-audio-api` downloads prebuilt binaries in a bash script during the
+  Gradle build. When Gradle invokes Git's `bash.exe` directly, Git's `/usr/bin` is
+  not on `PATH`, so the script dies with exit 127. The local config plugin
+  `plugins/with-audioapi-windows-fix.js` prepends Git's tool directories to that
+  task's `PATH` (applied to `android/build.gradle`; re-applied automatically on
+  `expo prebuild`).
 
-## Learn more
+## Architecture
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```
+src/
+├── app/            # expo-router screens (tabs + hidden /intonation route)
+├── audio/          # UI-independent audio: engine (shared AudioContext/session),
+│   └── pitch/      # drone synth, metronome scheduler, mic pitch tracker
+├── music/          # pure music theory: note<->freq, cents, scales (unit-tested)
+├── practice/       # intonation session engine, practice-time logging
+├── state/          # zustand stores (settings, drone, tuner, metronome)
+├── db/             # expo-sqlite: sessions + intonation results
+└── components/     # tuner gauge, chip row, themed primitives
+```
