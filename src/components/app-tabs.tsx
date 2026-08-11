@@ -1,6 +1,6 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import { Pressable, StyleSheet, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
@@ -15,7 +15,21 @@ const TABS: { name: string; title: string; icon: IconName }[] = [
   { name: 'scales', title: 'Scales', icon: 'music-clef-treble' },
 ];
 
-/** Icon pill + label + paddings — the bar's height above the gesture inset. */
+/**
+ * Plain tab button: no Android ripple, no press flash — the active tint
+ * change is feedback enough for a tab switch.
+ */
+function TabButton({
+  pressColor,
+  pressOpacity,
+  hoverEffect,
+  href,
+  ...props
+}: Record<string, unknown>) {
+  return <Pressable android_ripple={undefined} {...(props as object)} />;
+}
+
+/** Icon + label + paddings — the bar's height above the gesture inset. */
 const BAR_CONTENT_HEIGHT = 68;
 
 export default function AppTabs() {
@@ -36,10 +50,11 @@ export default function AppTabs() {
         tabBarActiveTintColor: colors.tint,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: styles.label,
+        tabBarButton: (props) => <TabButton {...props} />,
         tabBarStyle: {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
-          paddingTop: 8,
+          paddingTop: 10,
           height: BAR_CONTENT_HEIGHT + bottomPad,
           paddingBottom: bottomPad,
         },
@@ -50,14 +65,8 @@ export default function AppTabs() {
           name={tab.name}
           options={{
             title: tab.title,
-            tabBarIcon: ({ color, focused }) => (
-              <View
-                style={[
-                  styles.iconPill,
-                  focused && { backgroundColor: colors.tint + '22' },
-                ]}>
-                <MaterialCommunityIcons name={tab.icon} size={26} color={color} />
-              </View>
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name={tab.icon} size={26} color={color} />
             ),
           }}
         />
@@ -73,12 +82,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-  },
-  iconPill: {
-    width: 60,
-    height: 34,
-    borderRadius: 17,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginTop: 4,
   },
 });
