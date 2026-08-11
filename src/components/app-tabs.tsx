@@ -1,6 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router';
 import { StyleSheet, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
 
@@ -14,9 +15,16 @@ const TABS: { name: string; title: string; icon: IconName }[] = [
   { name: 'scales', title: 'Scales', icon: 'music-clef-treble' },
 ];
 
+/** Icon pill + label + paddings — the bar's height above the gesture inset. */
+const BAR_CONTENT_HEIGHT = 68;
+
 export default function AppTabs() {
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
+  const insets = useSafeAreaInsets();
+  // Explicit clearance for the Android gesture handle: the reported inset on
+  // some devices leaves labels nearly touching it, so enforce a floor.
+  const bottomPad = Math.max(insets.bottom, 20);
 
   return (
     <Tabs
@@ -25,15 +33,12 @@ export default function AppTabs() {
         tabBarActiveTintColor: colors.tint,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: styles.label,
-        // No fixed height: React Navigation adds the system gesture-bar inset
-        // itself, and a fixed height overrides that and causes overlap.
         tabBarStyle: {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
           paddingTop: 8,
-        },
-        tabBarItemStyle: {
-          paddingBottom: 6,
+          height: BAR_CONTENT_HEIGHT + bottomPad,
+          paddingBottom: bottomPad,
         },
       }}>
       {TABS.map((tab) => (
