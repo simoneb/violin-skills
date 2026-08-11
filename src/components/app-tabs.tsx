@@ -25,11 +25,15 @@ export default function AppTabs() {
         tabBarActiveTintColor: colors.tint,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: styles.label,
+        // No fixed height: React Navigation adds the system gesture-bar inset
+        // itself, and a fixed height overrides that and causes overlap.
         tabBarStyle: {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
-          height: 64,
           paddingTop: 6,
+        },
+        tabBarItemStyle: {
+          paddingBottom: 4,
         },
       }}>
       {TABS.map((tab) => (
