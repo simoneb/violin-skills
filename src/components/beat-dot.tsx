@@ -40,8 +40,8 @@ export function BeatDot({ active, color, idleColor }: BeatDotProps) {
 
 const styles = StyleSheet.create({
   dot: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
   },
 });

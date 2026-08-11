@@ -155,9 +155,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   stringBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     alignItems: 'center',
     justifyContent: 'center',
   },

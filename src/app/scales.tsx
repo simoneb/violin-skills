@@ -188,8 +188,8 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   scaleNote: {
-    width: 52,
-    height: 52,
+    width: 62,
+    height: 62,
     borderRadius: Spacing.two,
     alignItems: 'center',
     justifyContent: 'center',

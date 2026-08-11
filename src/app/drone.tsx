@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   preset: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: Spacing.three,
+    paddingVertical: Spacing.four,
     borderRadius: Spacing.three,
     borderWidth: 1,
   },
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   noteButton: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: Spacing.three,
+    paddingVertical: 20,
     borderRadius: Spacing.two,
     borderWidth: 1,
   },

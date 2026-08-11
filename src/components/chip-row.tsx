@@ -58,11 +58,11 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   chip: {
-    paddingHorizontal: 12,
-    paddingVertical: Spacing.two,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: 12,
     borderRadius: 999,
     borderWidth: 1,
-    minWidth: 44,
+    minWidth: 52,
     alignItems: 'center',
   },
 });

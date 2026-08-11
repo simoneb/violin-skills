@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   track: {
-    height: 96,
+    height: 128,
     borderRadius: Spacing.two,
     overflow: 'hidden',
     justifyContent: 'center',

@@ -17,7 +17,7 @@ export function ScreenHeader({ icon, title, subtitle }: ScreenHeaderProps) {
   return (
     <View style={styles.row}>
       <View style={[styles.badge, { backgroundColor: theme.tint + '22' }]}>
-        <MaterialCommunityIcons name={icon} size={24} color={theme.tint} />
+        <MaterialCommunityIcons name={icon} size={30} color={theme.tint} />
       </View>
       <View style={styles.textColumn}>
         <ThemedText style={styles.title}>{title}</ThemedText>
@@ -38,19 +38,19 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   badge: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 54,
+    height: 54,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   textColumn: {
     flex: 1,
-    gap: 1,
+    gap: 2,
   },
   title: {
-    fontSize: 24,
-    lineHeight: 28,
+    fontSize: 30,
+    lineHeight: 34,
     fontWeight: '700',
   },
 });

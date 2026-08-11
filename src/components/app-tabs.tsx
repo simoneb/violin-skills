@@ -30,10 +30,10 @@ export default function AppTabs() {
         tabBarStyle: {
           backgroundColor: colors.background,
           borderTopColor: colors.border,
-          paddingTop: 6,
+          paddingTop: 8,
         },
         tabBarItemStyle: {
-          paddingBottom: 4,
+          paddingBottom: 6,
         },
       }}>
       {TABS.map((tab) => (
@@ -48,7 +48,7 @@ export default function AppTabs() {
                   styles.iconPill,
                   focused && { backgroundColor: colors.tint + '22' },
                 ]}>
-                <MaterialCommunityIcons name={tab.icon} size={22} color={color} />
+                <MaterialCommunityIcons name={tab.icon} size={26} color={color} />
               </View>
             ),
           }}
@@ -63,13 +63,13 @@ export default function AppTabs() {
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '600',
   },
   iconPill: {
-    width: 52,
-    height: 30,
-    borderRadius: 15,
+    width: 60,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
   },

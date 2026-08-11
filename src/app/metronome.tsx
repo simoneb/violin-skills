@@ -207,15 +207,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.five,
   },
   tapButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 84,
+    height: 84,
+    borderRadius: 42,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   bottomSpacer: {
-    width: 72,
+    width: 84,
   },
   playButton: {
     width: 88,
