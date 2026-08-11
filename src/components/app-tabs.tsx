@@ -30,6 +30,9 @@ export default function AppTabs() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Freeze unfocused tabs: mounted-but-hidden screens otherwise keep
+        // re-rendering (tuner/scales both subscribe to live pitch updates).
+        freezeOnBlur: true,
         tabBarActiveTintColor: colors.tint,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: styles.label,

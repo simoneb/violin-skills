@@ -2,7 +2,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useCallback } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { InteractionManager, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScreenHeader } from '@/components/screen-header';
@@ -22,10 +22,14 @@ export default function TunerScreen() {
   const a4 = useSettings((s) => s.a4);
 
   // Listen while the screen is focused, release the mic when leaving.
+  // Mic startup is deferred past the tab transition so switching stays smooth.
   useFocusEffect(
     useCallback(() => {
-      start();
+      const task = InteractionManager.runAfterInteractions(() => {
+        start();
+      });
       return () => {
+        task.cancel();
         stop();
       };
     }, [start, stop]),

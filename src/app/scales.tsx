@@ -2,7 +2,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { InteractionManager, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PressableScale } from '@/components/pressable-scale';
@@ -42,11 +42,15 @@ export default function ScalesScreen() {
   const droneToggle = useDrone((s) => s.toggle);
   const droneSetMidi = useDrone((s) => s.setMidi);
 
-  // Live pitch feedback while the screen is focused (journal-logged as scales practice).
+  // Live pitch feedback while the screen is focused (journal-logged as scales
+  // practice). Mic startup is deferred past the tab transition.
   useFocusEffect(
     useCallback(() => {
-      start('scales');
+      const task = InteractionManager.runAfterInteractions(() => {
+        start('scales');
+      });
       return () => {
+        task.cancel();
         stop();
       };
     }, [start, stop]),
