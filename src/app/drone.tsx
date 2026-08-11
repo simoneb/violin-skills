@@ -74,28 +74,31 @@ export default function DroneScreen() {
           <ThemedText type="smallBold" themeColor="textSecondary">
             NOTE
           </ThemedText>
-          <View style={styles.noteGrid}>
-            {NOTE_NAMES_SHARP.map((name, pc) => {
-              const active = pc === selectedPitchClass;
-              return (
-                <PressableScale
-                  key={name}
-                  onPress={() => selectNote(pc, selectedOctave)}
-                  pressedScale={0.9}
-                  style={{
-                    ...styles.noteButton,
-                    backgroundColor: active ? theme.tint : theme.backgroundElement,
-                    borderColor: active ? theme.tint : theme.border,
-                  }}>
-                  <ThemedText
-                    type="smallBold"
-                    style={{ color: active ? theme.background : theme.text }}>
-                    {name}
-                  </ThemedText>
-                </PressableScale>
-              );
-            })}
-          </View>
+          {[NOTE_NAMES_SHARP.slice(0, 6), NOTE_NAMES_SHARP.slice(6)].map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.noteRow}>
+              {row.map((name, i) => {
+                const pc = rowIndex * 6 + i;
+                const active = pc === selectedPitchClass;
+                return (
+                  <PressableScale
+                    key={name}
+                    onPress={() => selectNote(pc, selectedOctave)}
+                    pressedScale={0.9}
+                    style={{
+                      ...styles.noteButton,
+                      backgroundColor: active ? theme.tint : theme.backgroundElement,
+                      borderColor: active ? theme.tint : theme.border,
+                    }}>
+                    <ThemedText
+                      type="smallBold"
+                      style={{ color: active ? theme.background : theme.text }}>
+                      {name}
+                    </ThemedText>
+                  </PressableScale>
+                );
+              })}
+            </View>
+          ))}
         </View>
 
         {/* Octave */}
@@ -195,14 +198,12 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.three,
     borderWidth: 1,
   },
-  noteGrid: {
+  noteRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing.two,
   },
   noteButton: {
-    width: '15%',
-    flexGrow: 1,
+    flex: 1,
     alignItems: 'center',
     paddingVertical: Spacing.three,
     borderRadius: Spacing.two,

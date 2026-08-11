@@ -1,3 +1,4 @@
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useCallback } from 'react';
@@ -51,17 +52,25 @@ export default function TunerScreen() {
             </ThemedText>
           </View>
         ) : (
-          <>
+          <View style={styles.main}>
             {/* Note display */}
             <View style={styles.noteDisplay}>
-              <ThemedText style={[styles.noteName, { color: noteColor }]}>
-                {hasNote ? note.name : '—'}
-                {hasNote && <ThemedText style={styles.octave}> {note.octave}</ThemedText>}
-              </ThemedText>
+              {hasNote ? (
+                <ThemedText style={[styles.noteName, { color: noteColor }]}>
+                  {note.name}
+                  <ThemedText style={styles.octave}> {note.octave}</ThemedText>
+                </ThemedText>
+              ) : (
+                <MaterialCommunityIcons
+                  name="waveform"
+                  size={72}
+                  color={theme.backgroundSelected}
+                />
+              )}
               <ThemedText type="small" themeColor="textSecondary">
                 {hasNote
                   ? `${note.frequency.toFixed(1)} Hz · ${cents >= 0 ? '+' : ''}${cents.toFixed(0)} cents`
-                  : 'Play a note'}
+                  : 'Listening — play a note'}
               </ThemedText>
               {inTune && (
                 <ThemedText type="smallBold" style={{ color: theme.success }}>
@@ -96,7 +105,7 @@ export default function TunerScreen() {
                 );
               })}
             </View>
-          </>
+          </View>
         )}
       </SafeAreaView>
     </ThemedView>
@@ -122,6 +131,12 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
+  },
+  main: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: Spacing.five,
+    paddingBottom: Spacing.six,
   },
   centerText: {
     textAlign: 'center',

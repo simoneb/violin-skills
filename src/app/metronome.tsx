@@ -127,7 +127,7 @@ export default function MetronomeScreen() {
             />
           </PressableScale>
           {/* symmetric spacer so the play button stays centered */}
-          <View style={styles.tapButton} />
+          <View style={styles.bottomSpacer} />
         </View>
       </SafeAreaView>
     </ThemedView>
@@ -195,6 +195,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bottomSpacer: {
+    width: 72,
   },
   playButton: {
     width: 88,
