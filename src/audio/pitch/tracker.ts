@@ -18,6 +18,16 @@ const MIN_VOLUME_DB = -35;
 const MIN_CLARITY = 0.85;
 /** Median window for spike rejection (odd). */
 const MEDIAN_WINDOW = 3;
+/**
+ * Drone-leakage rejection: the phone speaker bleeds the drone into the mic,
+ * and between violin notes the detector happily locks onto it. A reading is
+ * discarded as leakage when it sits within this many cents of a pitch the app
+ * itself is emitting AND the window is quieter than the gate below — a violin
+ * played near the phone is far louder than speaker bleed, so real playing of
+ * the drone note still gets through.
+ */
+const SUPPRESS_TOLERANCE_CENTS = 40;
+const SUPPRESS_MIN_VOLUME_DB = -20;
 
 export interface PitchReading {
   /** Median-filtered detected fundamental in Hz, or null for silence/noise. */
@@ -39,6 +49,7 @@ export class PitchTracker {
   private filled = 0;
   private recent: number[] = [];
   private lastAnalysisAt = 0;
+  private suppressedHz: number[] = [];
 
   constructor() {
     this.detector.minVolumeDecibels = MIN_VOLUME_DB;
@@ -46,6 +57,14 @@ export class PitchTracker {
 
   get isRunning(): boolean {
     return this.recorder !== null;
+  }
+
+  /**
+   * Frequencies the app is currently emitting itself (drone root/fifth).
+   * Quiet readings at these pitches are rejected as speaker→mic leakage.
+   */
+  setSuppressedPitches(freqs: number[]) {
+    this.suppressedHz = freqs;
   }
 
   async start(callback: PitchCallback) {
@@ -107,6 +126,10 @@ export class PitchTracker {
       this.recent = [];
       return { frequency: null, clarity };
     }
+    if (this.isLeakage(pitch)) {
+      this.recent = [];
+      return { frequency: null, clarity };
+    }
     this.recent.push(pitch);
     if (this.recent.length > MEDIAN_WINDOW) {
       this.recent.shift();
@@ -114,6 +137,26 @@ export class PitchTracker {
     const sorted = this.recent.slice().sort((a, b) => a - b);
     const median = sorted[Math.floor(sorted.length / 2)];
     return { frequency: median, clarity };
+  }
+
+  private isLeakage(pitch: number): boolean {
+    if (this.suppressedHz.length === 0) {
+      return false;
+    }
+    const matches = this.suppressedHz.some(
+      (f) => Math.abs(1200 * Math.log2(pitch / f)) < SUPPRESS_TOLERANCE_CENTS,
+    );
+    return matches && this.windowRmsDb() < SUPPRESS_MIN_VOLUME_DB;
+  }
+
+  private windowRmsDb(): number {
+    const win = this.window;
+    let sum = 0;
+    for (let i = 0; i < WINDOW_SIZE; i++) {
+      sum += win[i] * win[i];
+    }
+    const rms = Math.sqrt(sum / WINDOW_SIZE);
+    return rms > 0 ? 20 * Math.log10(rms) : -Infinity;
   }
 }
 

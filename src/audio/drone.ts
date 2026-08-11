@@ -2,6 +2,7 @@ import type { BiquadFilterNode, GainNode, OscillatorNode } from 'react-native-au
 
 import { midiToFrequency } from '@/music/notes';
 import { ensureSessionActive, getAudioContext, getMasterGain } from './engine';
+import { pitchTracker } from './pitch/tracker';
 
 const FADE_SECONDS = 0.4;
 /** Gain of the optional fifth relative to the root. */
@@ -36,6 +37,7 @@ class DroneEngine {
   private lfoGain: GainNode | null = null;
 
   private currentMidi: number | null = null;
+  private currentA4 = 440;
   private fifthEnabled = false;
 
   get isPlaying(): boolean {
@@ -77,6 +79,7 @@ class DroneEngine {
     this.lfoOsc.start(now);
 
     this.currentMidi = midi;
+    this.currentA4 = a4;
     this.fifthEnabled = withFifth;
 
     this.root = this.createVoice(midiToFrequency(midi, a4), 1);
@@ -85,6 +88,7 @@ class DroneEngine {
     }
 
     this.bus.gain.setTargetAtTime(1, now, FADE_SECONDS / 3);
+    this.publishEmitted();
   }
 
   stop() {
@@ -116,18 +120,21 @@ class DroneEngine {
     this.lfoOsc = null;
     this.lfoGain = null;
     this.currentMidi = null;
+    this.publishEmitted();
   }
 
   /** Retune while playing (also called when the A4 calibration changes). */
   setNote(midi: number, a4: number) {
     const ctx = getAudioContext();
     this.currentMidi = midi;
+    this.currentA4 = a4;
     if (this.root) {
       this.root.osc.frequency.setTargetAtTime(midiToFrequency(midi, a4), ctx.currentTime, 0.05);
     }
     if (this.fifth) {
       this.fifth.osc.frequency.setTargetAtTime(midiToFrequency(midi + 7, a4), ctx.currentTime, 0.05);
     }
+    this.publishEmitted();
   }
 
   setFifth(enabled: boolean, a4: number) {
@@ -145,6 +152,25 @@ class DroneEngine {
       fifth.osc.stop(ctx.currentTime + FADE_SECONDS * 2);
       this.fifth = null;
     }
+    this.publishEmitted();
+  }
+
+  /**
+   * Tell the pitch tracker which pitches this device is emitting, so speaker
+   * bleed isn't mistaken for the player. With the fifth sounding, the mixture
+   * can also read as the combined period an octave below the root.
+   */
+  private publishEmitted() {
+    if (this.currentMidi === null) {
+      pitchTracker.setSuppressedPitches([]);
+      return;
+    }
+    const rootHz = midiToFrequency(this.currentMidi, this.currentA4);
+    const freqs = [rootHz];
+    if (this.fifth) {
+      freqs.push(midiToFrequency(this.currentMidi + 7, this.currentA4), rootHz / 2);
+    }
+    pitchTracker.setSuppressedPitches(freqs);
   }
 
   private createVoice(frequency: number, level: number): Voice {
