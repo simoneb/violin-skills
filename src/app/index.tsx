@@ -1,10 +1,11 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Link, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ChipRow } from '@/components/chip-row';
+import { PressableScale } from '@/components/pressable-scale';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
@@ -69,7 +70,9 @@ export default function HomeScreen() {
           </View>
 
           {/* Practice stats */}
-          <ThemedView type="backgroundElement" style={styles.card}>
+          <ThemedView
+            type="backgroundElement"
+            style={[styles.card, { borderColor: theme.border }]}>
             <View style={styles.statsRow}>
               <View style={styles.stat}>
                 <ThemedText type="subtitle" style={{ color: theme.tint }}>
@@ -122,12 +125,20 @@ export default function HomeScreen() {
                 No practice logged yet this week — start a drone or take an intonation session.
               </ThemedText>
             )}
+
+            <Link href="/journal" asChild>
+              <PressableScale style={styles.journalLink}>
+                <MaterialCommunityIcons name="notebook-outline" size={16} color={theme.tint} />
+                <ThemedText type="smallBold" style={{ color: theme.tint }}>
+                  Open journal
+                </ThemedText>
+              </PressableScale>
+            </Link>
           </ThemedView>
 
           {/* Intonation trainer entry */}
           <Link href="/intonation" asChild>
-            {/* Link asChild requires a flattened (non-array) style */}
-            <Pressable style={{ ...styles.trainerButton, backgroundColor: theme.tint }}>
+            <PressableScale style={{ ...styles.trainerButton, backgroundColor: theme.tint }}>
               <MaterialCommunityIcons name="bullseye-arrow" size={24} color={theme.background} />
               <View style={styles.trainerText}>
                 <ThemedText type="smallBold" style={{ color: theme.background }}>
@@ -138,11 +149,13 @@ export default function HomeScreen() {
                 </ThemedText>
               </View>
               <MaterialCommunityIcons name="chevron-right" size={24} color={theme.background} />
-            </Pressable>
+            </PressableScale>
           </Link>
 
           {/* Settings */}
-          <ThemedView type="backgroundElement" style={styles.card}>
+          <ThemedView
+            type="backgroundElement"
+            style={[styles.card, { borderColor: theme.border }]}>
             <ThemedText type="smallBold" themeColor="textSecondary">
               REFERENCE PITCH (A4)
             </ThemedText>
@@ -180,6 +193,7 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
     padding: Spacing.three,
     borderRadius: Spacing.three,
+    borderWidth: 1,
   },
   statsRow: {
     flexDirection: 'row',
@@ -204,5 +218,10 @@ const styles = StyleSheet.create({
   },
   trainerText: {
     flex: 1,
+  },
+  journalLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.one,
   },
 });

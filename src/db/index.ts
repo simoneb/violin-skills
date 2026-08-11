@@ -72,6 +72,10 @@ export function endSession(id: number) {
   getDb().runSync('UPDATE practice_sessions SET ended_at = ? WHERE id = ?', [Date.now(), id]);
 }
 
+export function updateSessionNotes(id: number, notes: string) {
+  getDb().runSync('UPDATE practice_sessions SET notes = ? WHERE id = ?', [notes, id]);
+}
+
 export function listSessions(limit = 100): PracticeSession[] {
   const rows = getDb().getAllSync<{
     id: number;

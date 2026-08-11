@@ -1,10 +1,12 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
 import { useKeepAwake } from 'expo-keep-awake';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { Subdivision } from '@/audio/metronome';
+import { BeatDot } from '@/components/beat-dot';
+import { PressableScale } from '@/components/pressable-scale';
 import { ChipRow } from '@/components/chip-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -54,30 +56,23 @@ export default function MetronomeScreen() {
         {/* Beat indicator */}
         <View style={styles.beatRow}>
           {Array.from({ length: beatsPerBar }, (_, i) => (
-            <View
+            <BeatDot
               key={i}
-              style={[
-                styles.beatDot,
-                {
-                  backgroundColor:
-                    playing && i === currentBeat
-                      ? i === 0
-                        ? theme.tint
-                        : theme.text
-                      : theme.backgroundSelected,
-                },
-              ]}
+              active={playing && i === currentBeat}
+              color={i === 0 ? theme.tint : theme.text}
+              idleColor={theme.backgroundSelected}
             />
           ))}
         </View>
 
         {/* BPM controls */}
         <View style={styles.bpmControls}>
-          <Pressable
+          <PressableScale
             onPress={() => setBpm(bpm - 1)}
-            style={[styles.stepButton, { backgroundColor: theme.backgroundElement }]}>
+            pressedScale={0.88}
+            style={{ ...styles.stepButton, backgroundColor: theme.backgroundElement, borderColor: theme.border }}>
             <MaterialCommunityIcons name="minus" size={24} color={theme.text} />
-          </Pressable>
+          </PressableScale>
           <Slider
             style={styles.slider}
             minimumValue={MIN_BPM}
@@ -89,11 +84,12 @@ export default function MetronomeScreen() {
             maximumTrackTintColor={theme.backgroundSelected}
             thumbTintColor={theme.tint}
           />
-          <Pressable
+          <PressableScale
             onPress={() => setBpm(bpm + 1)}
-            style={[styles.stepButton, { backgroundColor: theme.backgroundElement }]}>
+            pressedScale={0.88}
+            style={{ ...styles.stepButton, backgroundColor: theme.backgroundElement, borderColor: theme.border }}>
             <MaterialCommunityIcons name="plus" size={24} color={theme.text} />
-          </Pressable>
+          </PressableScale>
         </View>
 
         <View style={styles.section}>
@@ -114,20 +110,22 @@ export default function MetronomeScreen() {
 
         {/* Tap tempo + play */}
         <View style={styles.bottomRow}>
-          <Pressable
+          <PressableScale
             onPress={tap}
-            style={[styles.tapButton, { backgroundColor: theme.backgroundElement }]}>
+            pressedScale={0.88}
+            style={{ ...styles.tapButton, backgroundColor: theme.backgroundElement, borderColor: theme.border }}>
             <ThemedText type="smallBold">TAP</ThemedText>
-          </Pressable>
-          <Pressable
+          </PressableScale>
+          <PressableScale
             onPress={toggle}
-            style={[styles.playButton, { backgroundColor: playing ? theme.error : theme.tint }]}>
+            pressedScale={0.92}
+            style={{ ...styles.playButton, backgroundColor: playing ? theme.error : theme.tint }}>
             <MaterialCommunityIcons
               name={playing ? 'stop' : 'play'}
               size={40}
               color={theme.background}
             />
-          </Pressable>
+          </PressableScale>
           {/* symmetric spacer so the play button stays centered */}
           <View style={styles.tapButton} />
         </View>
@@ -162,11 +160,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: Spacing.three,
   },
-  beatDot: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-  },
   bpmControls: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -179,6 +172,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -198,6 +192,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

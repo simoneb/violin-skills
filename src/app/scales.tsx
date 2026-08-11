@@ -2,8 +2,10 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useCallback, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { PressableScale } from '@/components/pressable-scale';
 
 import { centsColor, IN_TUNE_CENTS } from '@/components/tuner-gauge';
 import { ChipRow } from '@/components/chip-row';
@@ -141,12 +143,12 @@ export default function ScalesScreen() {
         </ScrollView>
 
         {/* Drone on tonic */}
-        <Pressable
+        <PressableScale
           onPress={toggleDrone}
-          style={[
-            styles.droneButton,
-            { backgroundColor: dronePlaying ? theme.error : theme.tint },
-          ]}>
+          style={{
+            ...styles.droneButton,
+            backgroundColor: dronePlaying ? theme.error : theme.tint,
+          }}>
           <MaterialCommunityIcons
             name={dronePlaying ? 'stop' : 'sine-wave'}
             size={22}
@@ -155,7 +157,7 @@ export default function ScalesScreen() {
           <ThemedText type="smallBold" style={{ color: theme.background }}>
             {dronePlaying ? 'Stop drone' : `Drone on ${midiToLabel(tonicMidi, flats)}`}
           </ThemedText>
-        </Pressable>
+        </PressableScale>
       </SafeAreaView>
     </ThemedView>
   );

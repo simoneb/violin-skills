@@ -9,11 +9,13 @@ import { Platform } from 'react-native';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: '#1A1D21',
+    background: '#FAF9F7',
+    backgroundElement: '#F0EEE9',
+    backgroundSelected: '#E3E0D8',
+    textSecondary: '#6B7078',
+    /** Subtle card/hairline borders. */
+    border: '#E7E4DD',
     tint: '#B4632C',
     /** In tune / good intonation. */
     success: '#1E8E3E',
@@ -23,11 +25,13 @@ export const Colors = {
     error: '#C5221F',
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: '#F2F3F5',
+    background: '#0B0D10',
+    backgroundElement: '#171A1F',
+    backgroundSelected: '#252A32',
+    textSecondary: '#9BA1AB',
+    /** Subtle card/hairline borders. */
+    border: '#22262E',
     tint: '#E8A05C',
     /** In tune / good intonation. */
     success: '#4ADE80',

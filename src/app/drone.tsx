@@ -1,8 +1,10 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
 import { useKeepAwake } from 'expo-keep-awake';
-import { Pressable, StyleSheet, Switch, View } from 'react-native';
+import { StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { PressableScale } from '@/components/pressable-scale';
 
 import { setMasterVolume } from '@/audio/engine';
 import { ChipRow } from '@/components/chip-row';
@@ -48,19 +50,20 @@ export default function DroneScreen() {
             {OPEN_STRINGS.map((s) => {
               const active = midi === s.midi;
               return (
-                <Pressable
+                <PressableScale
                   key={s.name}
                   onPress={() => setMidi(s.midi)}
-                  style={[
-                    styles.preset,
-                    { backgroundColor: active ? theme.tint : theme.backgroundElement },
-                  ]}>
+                  style={{
+                    ...styles.preset,
+                    backgroundColor: active ? theme.tint : theme.backgroundElement,
+                    borderColor: active ? theme.tint : theme.border,
+                  }}>
                   <ThemedText
                     type="subtitle"
                     style={{ color: active ? theme.background : theme.text }}>
                     {s.name}
                   </ThemedText>
-                </Pressable>
+                </PressableScale>
               );
             })}
           </View>
@@ -75,19 +78,21 @@ export default function DroneScreen() {
             {NOTE_NAMES_SHARP.map((name, pc) => {
               const active = pc === selectedPitchClass;
               return (
-                <Pressable
+                <PressableScale
                   key={name}
                   onPress={() => selectNote(pc, selectedOctave)}
-                  style={[
-                    styles.noteButton,
-                    { backgroundColor: active ? theme.tint : theme.backgroundElement },
-                  ]}>
+                  pressedScale={0.9}
+                  style={{
+                    ...styles.noteButton,
+                    backgroundColor: active ? theme.tint : theme.backgroundElement,
+                    borderColor: active ? theme.tint : theme.border,
+                  }}>
                   <ThemedText
                     type="smallBold"
                     style={{ color: active ? theme.background : theme.text }}>
                     {name}
                   </ThemedText>
-                </Pressable>
+                </PressableScale>
               );
             })}
           </View>
@@ -137,15 +142,19 @@ export default function DroneScreen() {
         <View style={styles.spacer} />
 
         {/* Play / stop */}
-        <Pressable
+        <PressableScale
           onPress={toggle}
-          style={[styles.playButton, { backgroundColor: playing ? theme.error : theme.tint }]}>
+          pressedScale={0.92}
+          style={{
+            ...styles.playButton,
+            backgroundColor: playing ? theme.error : theme.tint,
+          }}>
           <MaterialCommunityIcons
             name={playing ? 'stop' : 'play'}
             size={40}
             color={theme.background}
           />
-        </Pressable>
+        </PressableScale>
       </SafeAreaView>
     </ThemedView>
   );
@@ -184,6 +193,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.three,
     borderRadius: Spacing.three,
+    borderWidth: 1,
   },
   noteGrid: {
     flexDirection: 'row',
@@ -196,6 +206,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.three,
     borderRadius: Spacing.two,
+    borderWidth: 1,
   },
   spacer: {
     flex: 1,

@@ -43,6 +43,7 @@ export default function AppTabs() {
       ))}
       {/* Routes reachable from Home but hidden from the tab bar */}
       <Tabs.Screen name="intonation" options={{ href: null }} />
+      <Tabs.Screen name="journal" options={{ href: null }} />
     </Tabs>
   );
 }

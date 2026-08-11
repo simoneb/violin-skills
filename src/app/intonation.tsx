@@ -1,8 +1,10 @@
 import { useFocusEffect } from 'expo-router';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { PressableScale } from '@/components/pressable-scale';
 
 import { centsColor, IN_TUNE_CENTS, TunerGauge } from '@/components/tuner-gauge';
 import { ChipRow } from '@/components/chip-row';
@@ -71,13 +73,13 @@ export default function IntonationScreen() {
               </ThemedText>
             )}
             <View style={styles.spacer} />
-            <Pressable
+            <PressableScale
               onPress={start}
-              style={[styles.primaryButton, { backgroundColor: theme.tint }]}>
+              style={{ ...styles.primaryButton, backgroundColor: theme.tint }}>
               <ThemedText type="smallBold" style={{ color: theme.background }}>
                 Start session
               </ThemedText>
-            </Pressable>
+            </PressableScale>
           </View>
         )}
 
@@ -124,13 +126,17 @@ export default function IntonationScreen() {
             <TunerGauge cents={liveCents} />
 
             <View style={styles.spacer} />
-            <Pressable
+            <PressableScale
               onPress={() => cancel()}
-              style={[styles.secondaryButton, { backgroundColor: theme.backgroundElement }]}>
+              style={{
+                ...styles.secondaryButton,
+                backgroundColor: theme.backgroundElement,
+                borderColor: theme.border,
+              }}>
               <ThemedText type="smallBold" themeColor="textSecondary">
                 Stop session
               </ThemedText>
-            </Pressable>
+            </PressableScale>
           </View>
         )}
 
@@ -159,13 +165,13 @@ export default function IntonationScreen() {
               ))}
             </ScrollView>
 
-            <Pressable
+            <PressableScale
               onPress={() => cancel()}
-              style={[styles.primaryButton, { backgroundColor: theme.tint }]}>
+              style={{ ...styles.primaryButton, backgroundColor: theme.tint }}>
               <ThemedText type="smallBold" style={{ color: theme.background }}>
                 New session
               </ThemedText>
-            </Pressable>
+            </PressableScale>
           </View>
         )}
       </SafeAreaView>
@@ -237,6 +243,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.three,
     borderRadius: 999,
+    borderWidth: 1,
     marginBottom: Spacing.four,
   },
   summaryHeader: {

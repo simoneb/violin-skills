@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type ViewStyle } from 'react-native';
 
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { PressableScale } from './pressable-scale';
 import { ThemedText } from './themed-text';
 
 export interface ChipOption<T> {
@@ -29,19 +30,21 @@ export function ChipRow<T extends string | number>({
       {options.map((option) => {
         const active = option.value === selected;
         return (
-          <Pressable
+          <PressableScale
             key={String(option.value)}
             onPress={() => onSelect(option.value)}
-            style={[
-              styles.chip,
-              { backgroundColor: active ? theme.tint : theme.backgroundElement },
-            ]}>
+            pressedScale={0.92}
+            style={{
+              ...styles.chip,
+              backgroundColor: active ? theme.tint : theme.backgroundElement,
+              borderColor: active ? theme.tint : theme.border,
+            }}>
             <ThemedText
               type="smallBold"
               style={{ color: active ? theme.background : theme.textSecondary }}>
               {option.label}
             </ThemedText>
-          </Pressable>
+          </PressableScale>
         );
       })}
     </View>
@@ -58,6 +61,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
     borderRadius: 999,
+    borderWidth: 1,
     minWidth: 52,
     alignItems: 'center',
   },
