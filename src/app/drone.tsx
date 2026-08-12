@@ -1,5 +1,4 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Slider from '@react-native-community/slider';
 import { useKeepAwake } from 'expo-keep-awake';
 import { StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,10 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PressableScale } from '@/components/pressable-scale';
 import { ScreenHeader } from '@/components/screen-header';
 
-import { setMasterVolume } from '@/audio/engine';
 import { ChipRow } from '@/components/chip-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { VolumeSlider } from '@/components/volume-slider';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { midiToFrequency, midiToLabel, NOTE_NAMES_SHARP, OPEN_STRINGS, pitchClass } from '@/music/notes';
@@ -23,7 +22,7 @@ export default function DroneScreen() {
   useKeepAwake();
   const theme = useTheme();
   const { playing, midi, withFifth, toggle, setMidi, setFifth } = useDrone();
-  const { a4, volume, setVolume } = useSettings();
+  const a4 = useSettings((s) => s.a4);
 
   const selectedPitchClass = pitchClass(midi);
   const selectedOctave = Math.floor(midi / 12) - 1;
@@ -124,23 +123,7 @@ export default function DroneScreen() {
         </View>
 
         {/* Volume */}
-        <View style={styles.section}>
-          <ThemedText type="smallBold" themeColor="textSecondary">
-            VOLUME
-          </ThemedText>
-          <Slider
-            minimumValue={0}
-            maximumValue={1}
-            value={volume}
-            onValueChange={(v) => {
-              setVolume(v);
-              setMasterVolume(v);
-            }}
-            minimumTrackTintColor={theme.tint}
-            maximumTrackTintColor={theme.backgroundSelected}
-            thumbTintColor={theme.tint}
-          />
-        </View>
+        <VolumeSlider source="drone" />
 
         <View style={styles.spacer} />
 

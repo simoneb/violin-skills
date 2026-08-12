@@ -1,7 +1,7 @@
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Slider from '@react-native-community/slider';
 import { useKeepAwake } from 'expo-keep-awake';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { Subdivision } from '@/audio/metronome';
@@ -11,6 +11,7 @@ import { ScreenHeader } from '@/components/screen-header';
 import { ChipRow } from '@/components/chip-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { VolumeSlider } from '@/components/volume-slider';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { MAX_BPM, MIN_BPM, useMetronome } from '@/state/metronome';
@@ -44,81 +45,84 @@ export default function MetronomeScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <ScreenHeader
-          icon="metronome"
-          title="Metronome"
-          subtitle={`${bpm} BPM · ${tempoMarking(bpm)}`}
-        />
+        {/* Controls scroll; TAP / play stay pinned above the tab bar. */}
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <ScreenHeader
+            icon="metronome"
+            title="Metronome"
+            subtitle={`${bpm} BPM · ${tempoMarking(bpm)}`}
+          />
 
-        {/* Tempo card: BPM display, beat dots, slider */}
-        <ThemedView
-          type="backgroundElement"
-          style={[styles.card, { borderColor: theme.border }]}>
-          <View style={styles.bpmDisplay}>
-            <ThemedText style={styles.bpmValue}>{bpm}</ThemedText>
-            <ThemedText themeColor="textSecondary">
-              BPM · {tempoMarking(bpm)}
-            </ThemedText>
-          </View>
+          {/* Tempo card: BPM display, beat dots, slider */}
+          <ThemedView
+            type="backgroundElement"
+            style={[styles.card, { borderColor: theme.border }]}>
+            <View style={styles.bpmDisplay}>
+              <ThemedText style={styles.bpmValue}>{bpm}</ThemedText>
+              <ThemedText themeColor="textSecondary">
+                BPM · {tempoMarking(bpm)}
+              </ThemedText>
+            </View>
 
-          <View style={styles.beatRow}>
-            {Array.from({ length: beatsPerBar }, (_, i) => (
-              <BeatDot
-                key={i}
-                active={playing && i === currentBeat}
-                color={i === 0 ? theme.tint : theme.text}
-                idleColor={theme.backgroundSelected}
+            <View style={styles.beatRow}>
+              {Array.from({ length: beatsPerBar }, (_, i) => (
+                <BeatDot
+                  key={i}
+                  active={playing && i === currentBeat}
+                  color={i === 0 ? theme.tint : theme.text}
+                  idleColor={theme.backgroundSelected}
+                />
+              ))}
+            </View>
+
+            <View style={styles.bpmControls}>
+              <PressableScale
+                onPress={() => setBpm(bpm - 1)}
+                pressedScale={0.88}
+                style={{ ...styles.stepButton, backgroundColor: theme.background, borderColor: theme.border }}>
+                <MaterialCommunityIcons name="minus" size={24} color={theme.text} />
+              </PressableScale>
+              <Slider
+                style={styles.slider}
+                minimumValue={MIN_BPM}
+                maximumValue={MAX_BPM}
+                step={1}
+                value={bpm}
+                onValueChange={setBpm}
+                minimumTrackTintColor={theme.tint}
+                maximumTrackTintColor={theme.backgroundSelected}
+                thumbTintColor={theme.tint}
               />
-            ))}
-          </View>
+              <PressableScale
+                onPress={() => setBpm(bpm + 1)}
+                pressedScale={0.88}
+                style={{ ...styles.stepButton, backgroundColor: theme.background, borderColor: theme.border }}>
+                <MaterialCommunityIcons name="plus" size={24} color={theme.text} />
+              </PressableScale>
+            </View>
+          </ThemedView>
 
-          <View style={styles.bpmControls}>
-            <PressableScale
-              onPress={() => setBpm(bpm - 1)}
-              pressedScale={0.88}
-              style={{ ...styles.stepButton, backgroundColor: theme.background, borderColor: theme.border }}>
-              <MaterialCommunityIcons name="minus" size={24} color={theme.text} />
-            </PressableScale>
-            <Slider
-              style={styles.slider}
-              minimumValue={MIN_BPM}
-              maximumValue={MAX_BPM}
-              step={1}
-              value={bpm}
-              onValueChange={setBpm}
-              minimumTrackTintColor={theme.tint}
-              maximumTrackTintColor={theme.backgroundSelected}
-              thumbTintColor={theme.tint}
-            />
-            <PressableScale
-              onPress={() => setBpm(bpm + 1)}
-              pressedScale={0.88}
-              style={{ ...styles.stepButton, backgroundColor: theme.background, borderColor: theme.border }}>
-              <MaterialCommunityIcons name="plus" size={24} color={theme.text} />
-            </PressableScale>
-          </View>
-        </ThemedView>
+          {/* Rhythm card: time signature, subdivision, volume */}
+          <ThemedView
+            type="backgroundElement"
+            style={[styles.card, { borderColor: theme.border }]}>
+            <View style={styles.section}>
+              <ThemedText type="smallBold" themeColor="textSecondary">
+                TIME SIGNATURE
+              </ThemedText>
+              <ChipRow options={TIME_SIGNATURES} selected={beatsPerBar} onSelect={setBeatsPerBar} />
+            </View>
 
-        {/* Rhythm card: time signature + subdivision */}
-        <ThemedView
-          type="backgroundElement"
-          style={[styles.card, { borderColor: theme.border }]}>
-          <View style={styles.section}>
-            <ThemedText type="smallBold" themeColor="textSecondary">
-              TIME SIGNATURE
-            </ThemedText>
-            <ChipRow options={TIME_SIGNATURES} selected={beatsPerBar} onSelect={setBeatsPerBar} />
-          </View>
+            <View style={styles.section}>
+              <ThemedText type="smallBold" themeColor="textSecondary">
+                SUBDIVISION
+              </ThemedText>
+              <ChipRow options={SUBDIVISIONS} selected={subdivision} onSelect={setSubdivision} />
+            </View>
 
-          <View style={styles.section}>
-            <ThemedText type="smallBold" themeColor="textSecondary">
-              SUBDIVISION
-            </ThemedText>
-            <ChipRow options={SUBDIVISIONS} selected={subdivision} onSelect={setSubdivision} />
-          </View>
-        </ThemedView>
-
-        <View style={styles.spacer} />
+            <VolumeSlider source="metronome" />
+          </ThemedView>
+        </ScrollView>
 
         {/* Tap tempo + play */}
         <View style={styles.bottomRow}>
@@ -160,8 +164,8 @@ const styles = StyleSheet.create({
     gap: Spacing.four,
   },
   card: {
-    gap: Spacing.four,
-    padding: Spacing.four,
+    gap: Spacing.three,
+    padding: Spacing.three,
     borderRadius: Spacing.three,
     borderWidth: 1,
   },
@@ -197,8 +201,9 @@ const styles = StyleSheet.create({
   section: {
     gap: Spacing.two,
   },
-  spacer: {
-    flex: 1,
+  scroll: {
+    gap: Spacing.four,
+    paddingBottom: Spacing.two,
   },
   bottomRow: {
     flexDirection: 'row',
