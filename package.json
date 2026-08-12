@@ -2,6 +2,11 @@
   "name": "violin-skills",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "packageManager": "npm@11.6.2",
+  "engines": {
+    "node": ">=22.12",
+    "npm": "11.x"
+  },
   "dependencies": {
     "@expo/ui": "~57.0.10",
     "@expo/vector-icons": "^15.0.2",
@@ -46,6 +51,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "eas-build-pre-install": "npm i -g npm@11.6.2",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
