@@ -58,6 +58,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "update:preview": "npx eas-cli update --channel preview --environment preview",
+    "update:production": "npx eas-cli update --channel production --environment production",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },

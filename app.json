@@ -7,6 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "violinskills",
     "userInterfaceStyle": "automatic",
+    "platforms": ["ios", "android"],
     "ios": {
       "icon": "./assets/expo.icon"
     },
