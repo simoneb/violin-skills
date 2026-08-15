@@ -479,20 +479,17 @@ img {
   text-align: center;
 }
 
-/* Phone captures are 600×1267. Left to fill their column they tower over the
-   text beside them, so height leads and width follows. */
+/* Phone captures are all 600×1267. Pin the rendered width rather than capping
+   height: with max-height the final size depends on each column's width, so
+   the same phone came out at a different scale in each section. */
 .screen img {
-  width: auto;
-  max-width: 100%;
-  max-height: 600px;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
   margin-inline: auto;
   border-radius: 14px;
   border: 1px solid var(--line);
   background: var(--surface);
-}
-
-.split .screen img {
-  max-height: 440px;
 }
 
 /* --------------------------------------------------------------- grading */
