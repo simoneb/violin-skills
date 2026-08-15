@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { mixColors } from '@/utils/color';
 import { ThemedText } from './themed-text';
 
 /** Range of the gauge in cents (±). */
@@ -22,6 +23,17 @@ export function centsColor(cents: number, theme: ReturnType<typeof useTheme>): s
   if (abs <= IN_TUNE_CENTS) return theme.success;
   if (abs <= 15) return theme.warning;
   return theme.error;
+}
+
+/**
+ * Direction-aware color: blue when flat (below pitch), red when sharp (above
+ * pitch), graduated by how far off the note is. Green when in tune.
+ */
+export function directionalCentsColor(cents: number, theme: ReturnType<typeof useTheme>): string {
+  const abs = Math.abs(cents);
+  if (abs <= IN_TUNE_CENTS) return theme.success;
+  const t = (abs - IN_TUNE_CENTS) / (RANGE - IN_TUNE_CENTS);
+  return mixColors(theme.backgroundElement, cents < 0 ? theme.flat : theme.error, t);
 }
 
 /** Horizontal cents gauge: tick marks, a green in-tune zone and a smoothed needle. */

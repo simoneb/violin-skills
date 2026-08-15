@@ -23,6 +23,8 @@ export const Colors = {
     warning: '#B8860B',
     /** Clearly off. */
     error: '#C5221F',
+    /** Flat / below pitch. */
+    flat: '#2563EB',
   },
   dark: {
     text: '#F2F3F5',
@@ -39,6 +41,8 @@ export const Colors = {
     warning: '#FACC15',
     /** Clearly off. */
     error: '#F87171',
+    /** Flat / below pitch. */
+    flat: '#60A5FA',
   },
 } as const;
 

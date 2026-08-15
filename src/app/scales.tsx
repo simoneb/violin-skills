@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PressableScale } from '@/components/pressable-scale';
 import { ScreenHeader } from '@/components/screen-header';
 
-import { centsColor, IN_TUNE_CENTS } from '@/components/tuner-gauge';
+import { directionalCentsColor, IN_TUNE_CENTS } from '@/components/tuner-gauge';
 import { ChipRow } from '@/components/chip-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -18,6 +18,7 @@ import { midiToLabel, NOTE_NAMES_SHARP, VIOLIN_MIN_MIDI } from '@/music/notes';
 import { buildScale, SCALE_LABELS, type ScaleType, usesFlats } from '@/music/scales';
 import { useDrone } from '@/state/drone';
 import { useTuner } from '@/state/tuner';
+import { pickContrastText } from '@/utils/color';
 
 const KEY_OPTIONS = NOTE_NAMES_SHARP.map((name, pc) => ({ value: pc, label: name }));
 const SCALE_OPTIONS = (Object.keys(SCALE_LABELS) as ScaleType[]).map((type) => ({
@@ -113,20 +114,24 @@ export default function ScalesScreen() {
             <View style={styles.noteGrid}>
               {scale.map((n, i) => {
                 const active = i === activeIndex;
-                const color = active ? centsColor(cents, theme) : theme.backgroundElement;
+                const color = active ? directionalCentsColor(cents, theme) : theme.backgroundElement;
+                const textColor = active
+                  ? pickContrastText(color, theme.text, theme.background)
+                  : theme.text;
+                const secondaryTextColor = active
+                  ? pickContrastText(color, theme.text, theme.background)
+                  : theme.textSecondary;
                 return (
                   <View
                     key={`${n.midi}-${i}`}
                     style={[styles.scaleNote, { backgroundColor: color }]}>
-                    <ThemedText
-                      type="smallBold"
-                      style={{ color: active ? theme.background : theme.text }}>
+                    <ThemedText type="smallBold" style={{ color: textColor }}>
                       {n.name}
                     </ThemedText>
                     <ThemedText
                       type="small"
                       style={{
-                        color: active ? theme.background : theme.textSecondary,
+                        color: secondaryTextColor,
                         fontSize: 10,
                         lineHeight: 12,
                       }}>
