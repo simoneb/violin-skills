@@ -79,6 +79,19 @@ function copyrightLines(text) {
   ].slice(0, 4);
 }
 
+// The stored body is shared by every package under that licence, so it must not
+// carry the copyright line of whichever package happened to be read first —
+// "Copyright (c) 2021-present Toyobayashi" above the MIT terms reads as though
+// it covers all 522 of them. Each package's own notice is listed against it.
+function genericBody(text) {
+  return text
+    .split('\n')
+    .filter((line) => !/^[ \t]*(?:[#*/;-]+[ \t]*)?copyright\b/i.test(line))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 const packages = [];
 const licenseTexts = {};
 const unknown = [];
@@ -98,7 +111,7 @@ for (const dir of productionPackagePaths()) {
   if (license === 'UNKNOWN' && !text) unknown.push(pkg.name);
   // Keep the first full body seen for each license id as the canonical text.
   if (text && !licenseTexts[license] && text.length < 60_000) {
-    licenseTexts[license] = text;
+    licenseTexts[license] = genericBody(text);
   }
 
   packages.push({
