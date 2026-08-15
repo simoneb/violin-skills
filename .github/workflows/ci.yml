@@ -1,0 +1,27 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22.x
+
+      # The lockfile is written by npm 11. Node 22 ships npm 10, which lays out
+      # peer-dep-only packages (@emnapi/*) differently and makes `npm ci` fail on
+      # a lockfile it did not write. Same reason eas-build-pre-install upgrades
+      # npm on the EAS builder — when this version moves, move it in all three
+      # places: packageManager, engines, and that hook.
+      - run: npm i -g npm@11.6.2
+      - run: npm ci
+
+      # Typechecking works on a clean checkout even though expo-router's typed
+      # routes are generated into .expo/ by the dev server: without that file the
+      # Href type falls back to a permissive one rather than erroring.
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test

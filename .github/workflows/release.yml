@@ -1,0 +1,255 @@
+name: Release
+
+# Two ways in. The everyday one is the button: Actions > Release > Run workflow,
+# pick a bump level, and this does the version bump, the commit, the tag and the
+# release itself — nothing to do locally, and no second place to keep in sync.
+# Equivalently, `gh workflow run release.yml -f bump=patch`.
+#
+# Pushing a tag by hand still releases, for a release prepared locally. That path
+# cannot be folded into the first one: a push made with the default GITHUB_TOKEN
+# deliberately does not trigger further workflows, so a job that pushed a tag
+# would never set off a tag-triggered release. Hence one workflow that both
+# creates the tag and releases it, rather than two chained by the tag.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the version to raise
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      version:
+        description: Exact version instead, e.g. 1.1.0 (wins over the bump level)
+        type: string
+
+  push:
+    tags: ['v*']
+
+# Two releases at once would race on the tag and on the version bump.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  # Tests run before anything is tagged, so a failing tree cannot become a
+  # release. On the manual path this is what stands between a button press and a
+  # bad version being published.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22.x
+      # See ci.yml: the lockfile needs npm 11, Node 22 ships npm 10.
+      - run: npm i -g npm@11.6.2
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+  # Settles what version is being released, and on the manual path brings the
+  # repository to it. Both paths end with a tag that exists and an app.json that
+  # agrees with it.
+  prepare:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The bump commit belongs on the default branch, not on the detached
+          # HEAD a tag push checks out.
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - id: resolve
+        env:
+          EVENT: ${{ github.event_name }}
+          BUMP: ${{ inputs.bump }}
+          EXPLICIT: ${{ inputs.version }}
+          PUSHED_TAG: ${{ github.ref_name }}
+        # Outputs are written to $GITHUB_OUTPUT from inside the script, not by
+        # redirecting it: git prints to stdout too, and its "[main abc] Release
+        # 1.0.1" would land in the output file as an invalid line.
+        run: |
+          python3 - <<'PY'
+          import os, pathlib, re, subprocess
+
+          out = pathlib.Path(os.environ["GITHUB_OUTPUT"]).open("a")
+          emit = lambda **kw: [print(f"{k}={v}", file=out) for k, v in kw.items()]
+
+          # Edited as text rather than parsed and re-dumped as JSON: json.dump
+          # would reformat the whole of app.json and bury the one-line change.
+          app = pathlib.Path("app.json")
+          text = app.read_text(encoding="utf-8")
+          matches = re.findall(r'"version":\s*"(\d+\.\d+\.\d+)"', text)
+          if len(matches) != 1:
+              raise SystemExit(
+                  f'::error::expected exactly one "version" in app.json, found {len(matches)}'
+              )
+          current = matches[0]
+
+          if os.environ["EVENT"] == "push":
+              # The tag is the claim; app.json has to back it up. Shipping an APK
+              # that reports a version other than its tag is not worth the
+              # debugging it costs.
+              version = os.environ["PUSHED_TAG"].removeprefix("v")
+              if version != current:
+                  raise SystemExit(
+                      f"::error::tag v{version} does not match app.json version {current}"
+                  )
+              emit(tag=f"v{version}", version=version)
+              raise SystemExit(0)
+
+          explicit = os.environ.get("EXPLICIT", "").strip().removeprefix("v")
+          if explicit:
+              if not re.fullmatch(r"\d+\.\d+\.\d+", explicit):
+                  raise SystemExit(f"::error::'{explicit}' is not a X.Y.Z version")
+              version = explicit
+          else:
+              major, minor, patch = (int(p) for p in current.split("."))
+              bump = os.environ["BUMP"]
+              if bump == "major":
+                  major, minor, patch = major + 1, 0, 0
+              elif bump == "minor":
+                  minor, patch = minor + 1, 0
+              else:
+                  patch += 1
+              version = f"{major}.{minor}.{patch}"
+
+          tag = f"v{version}"
+          existing = subprocess.run(
+              ["git", "tag", "--list", tag], capture_output=True, text=True, check=True
+          ).stdout.split()
+          if existing:
+              raise SystemExit(f"::error::{tag} already exists")
+          if version == current:
+              raise SystemExit(f"::error::{version} is already the current version")
+
+          app.write_text(
+              text.replace(f'"version": "{current}"', f'"version": "{version}"', 1),
+              encoding="utf-8",
+          )
+
+          # [skip ci] because the push-to-main CI run would only re-test what this
+          # workflow just tested, one commit earlier.
+          run = lambda *args: subprocess.run(args, check=True)
+          run("git", "config", "user.name", "github-actions[bot]")
+          run("git", "config", "user.email",
+              "41898282+github-actions[bot]@users.noreply.github.com")
+          run("git", "commit", "-am", f"Release {version} [skip ci]")
+          run("git", "tag", "-a", tag, "-m", f"Violin Skills {version}")
+          run("git", "push", "--follow-tags")
+
+          emit(tag=tag, version=version)
+          PY
+
+  # The APK is built by EAS rather than by this runner, because that is where the
+  # upload keystore lives — an APK signed with anything else cannot update an
+  # install that came from an earlier release.
+  build:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22.x
+      - run: npm i -g npm@11.6.2
+      - run: npm ci
+
+      # --wait blocks until the cloud build finishes, so the release job below
+      # has a real artifact to attach rather than a queued build id.
+      - name: Build the APK on EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx eas-cli build \
+            --platform android \
+            --profile release \
+            --non-interactive \
+            --wait \
+            --json > build.json
+          cat build.json
+
+      - name: Collect the artifact
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          set -euo pipefail
+          url=$(python3 -c "import json;print(json.load(open('build.json'))[0]['artifacts']['applicationArchiveUrl'])")
+          mkdir -p assets
+          curl -fsSL "$url" -o "assets/violin-skills-$VERSION.apk"
+          ls -lh assets
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-apk
+          path: assets/
+
+  github-release:
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.tag }}
+          fetch-depth: 0
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: dist/
+
+      # The APK is not distributed through Play, so nothing on the device vouches
+      # for it. A published checksum is the only thing a downloader can verify
+      # against.
+      - name: Checksum every asset
+        run: cd dist && sha256sum * > SHA256SUMS.txt
+
+      # The notes are the commit subjects since the previous tag, plus the one
+      # thing a reader actually needs: which file to download and how to install
+      # something that did not come from a store.
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.prepare.outputs.tag }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          previous=$(git tag --sort=-version:refname | grep -A1 -x "$TAG" | tail -n1)
+          {
+            echo "## Install"
+            echo
+            echo "Download \`violin-skills-$VERSION.apk\` and open it on your phone."
+            echo "Android will ask once for permission to install apps from your browser"
+            echo "or file manager — this app is not on Google Play yet, so there is no"
+            echo "store to vouch for it."
+            echo
+            echo "It needs Android 7.0 or newer, and the microphone permission for the"
+            echo "tuner, scales and intonation trainer. Nothing it hears leaves the phone."
+            echo
+            echo "Updating from an earlier release keeps your practice history."
+            echo
+            echo "Checksum, in \`SHA256SUMS.txt\`:"
+            echo
+            echo '```bash'
+            echo "sha256sum violin-skills-$VERSION.apk"
+            echo '```'
+            echo
+            echo "## Changes"
+            echo
+            if [ -n "$previous" ] && [ "$previous" != "$TAG" ]; then
+              git log --no-merges --pretty='- %s' "${previous}..${TAG}"
+            else
+              git log --no-merges --pretty='- %s' "$TAG"
+            fi
+          } > notes.md
+          gh release create "$TAG" dist/* --title "$TAG" --notes-file notes.md
