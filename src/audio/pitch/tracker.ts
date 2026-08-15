@@ -40,7 +40,8 @@ export type PitchCallback = (reading: PitchReading) => void;
 
 /**
  * Streams microphone audio into a rolling window and runs McLeod pitch
- * detection on every chunk. Consumers get ~40 readings per second.
+ * detection on it, throttled to ANALYSIS_INTERVAL_MS. Consumers get ~10
+ * readings per second.
  */
 export class PitchTracker {
   private recorder: AudioRecorder | null = null;
