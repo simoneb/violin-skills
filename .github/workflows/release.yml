@@ -178,20 +178,24 @@ jobs:
             --json > build.json
           cat build.json
 
+      # Staged in release-assets/, not assets/: the repository already has an
+      # assets/ directory holding the app icons, and uploading into it ships
+      # expo.icon/ and images/ to the release job, where sha256sum then dies on
+      # the directories.
       - name: Collect the artifact
         env:
           VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
           url=$(python3 -c "import json;print(json.load(open('build.json'))[0]['artifacts']['applicationArchiveUrl'])")
-          mkdir -p assets
-          curl -fsSL "$url" -o "assets/violin-skills-$VERSION.apk"
-          ls -lh assets
+          mkdir -p release-assets
+          curl -fsSL "$url" -o "release-assets/violin-skills-$VERSION.apk"
+          ls -lh release-assets
 
       - uses: actions/upload-artifact@v7
         with:
           name: release-apk
-          path: assets/
+          path: release-assets/
 
   github-release:
     needs: [prepare, build]
