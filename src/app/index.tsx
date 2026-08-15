@@ -168,6 +168,20 @@ export default function HomeScreen() {
               Used by the drone, tuner, scales and intonation trainer.
             </ThemedText>
           </ThemedView>
+
+          {/* About */}
+          <Link href="/licenses" asChild>
+            <PressableScale style={styles.aboutLink}>
+              <MaterialCommunityIcons
+                name="scale-balance"
+                size={16}
+                color={theme.textSecondary}
+              />
+              <ThemedText type="small" themeColor="textSecondary">
+                Open-source licenses
+              </ThemedText>
+            </PressableScale>
+          </Link>
         </ScrollView>
       </SafeAreaView>
     </ThemedView>
@@ -227,5 +241,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.one,
+  },
+  aboutLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.two,
   },
 });
