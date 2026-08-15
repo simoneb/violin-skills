@@ -1,0 +1,68 @@
+Violin Skills
+Copyright (C) 2026 Simone Busoli
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <https://www.gnu.org/licenses/>.
+
+The full license text is in the LICENSE file at the root of this repository.
+
+
+NAME, LOGO AND ARTWORK ARE NOT COVERED BY THE AGPL
+--------------------------------------------------
+
+The AGPL grant above applies to the *source code* of this project. It does not
+grant any right to use the following, which are reserved by the copyright
+holder:
+
+  - The name "Violin Skills" and any confusingly similar name.
+  - The application icon and adaptive-icon artwork
+    (assets/expo.icon, assets/images/icon.png,
+     assets/images/android-icon-*.png, assets/images/splash-icon.png,
+     assets/images/favicon.png, assets/images/tabIcons/).
+  - Store listing copy, screenshots and promotional graphics.
+
+You are free to build, modify and redistribute this software under the AGPL.
+If you distribute a modified version publicly, you must do so under a different
+name and with different icon artwork. This is the same arrangement used by
+Chromium/Chrome and Firefox/Iceweasel: the code is free, the brand is not.
+
+
+DUAL LICENSING
+--------------
+
+The copyright holder retains the right to distribute this software under other
+terms, including proprietary terms — for example, the builds published to the
+Google Play Store and the Apple App Store. Contributors grant the rights that
+make this possible via the Contributor License Agreement (see CLA.md).
+
+
+THIRD-PARTY SOFTWARE
+--------------------
+
+This project depends on third-party open-source software. All runtime
+dependencies are distributed under the MIT License, including:
+
+  - expo, expo-router and the Expo SDK modules  — (C) 650 Industries, Inc.
+  - react, react-dom                            — (C) Meta Platforms, Inc.
+  - react-native                                — (C) Meta Platforms, Inc.
+  - react-native-audio-api,
+    react-native-gesture-handler,
+    react-native-reanimated,
+    react-native-worklets                       — (C) Software Mansion
+  - react-native-safe-area-context, react-native-screens
+  - @react-native-community/slider
+  - pitchy                                      — (C) Ian Johnson
+  - zustand                                     — (C) Paul Henschel
+
+Each package's full license text ships in its own directory under node_modules.
+A complete, generated attribution list must accompany any binary distribution
+of this app.

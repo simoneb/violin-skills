@@ -2,6 +2,7 @@
   "name": "violin-skills",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "license": "AGPL-3.0-or-later",
   "packageManager": "npm@11.6.2",
   "engines": {
     "node": ">=22.12",
@@ -61,7 +62,8 @@
     "update:preview": "npx eas-cli update --channel preview --environment preview",
     "update:production": "npx eas-cli update --channel production --environment production",
     "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "licenses:generate": "node ./scripts/generate-licenses.mjs"
   },
   "jest": {
     "preset": "jest-expo",
