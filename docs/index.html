@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Violin Skills — practice companion for violinists</title>
+    <meta
+      name="description"
+      content="A drone, tuner, metronome and scale library for violinists, plus an intonation trainer that scores every note in cents. Free, open source, and entirely offline."
+    />
+    <meta name="theme-color" content="#4F46E5" />
+    <link rel="icon" href="icon.png" />
+
+    <meta property="og:title" content="Violin Skills" />
+    <meta
+      property="og:description"
+      content="Practice alone. Play in tune. A drone, tuner, metronome, scales and an intonation trainer that scores every note in cents."
+    />
+    <meta property="og:image" content="icon.png" />
+    <meta property="og:type" content="website" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Public+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="wrap">
+      <nav class="topbar">
+        <a class="brand" href="./">
+          <img src="icon.png" alt="" />
+          Violin Skills
+        </a>
+        <a href="#tools">Tools</a>
+        <a href="#open">Open source</a>
+        <a href="https://github.com/simoneb/violin-skills">GitHub</a>
+      </nav>
+
+      <header class="hero">
+        <div>
+          <p class="tag">Android · free · no account</p>
+          <h1>Practice alone.<br />Play in tune.</h1>
+          <p class="hero-lead">
+            A drone, tuner, metronome and scale library in one app — plus an intonation
+            trainer that scores every note in cents, so you can see the drift your ear
+            lets through.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="https://github.com/simoneb/violin-skills"
+              >Read the source</a
+            >
+            <a
+              class="btn btn-quiet"
+              href="https://github.com/simoneb/violin-skills/releases"
+              >Get notified of releases</a
+            >
+          </div>
+          <p class="cta-note">
+            Not on Google Play yet — the first Android release is in preparation.
+          </p>
+        </div>
+
+        <!-- The signature: the app's own cents scale, running in the page.
+             The app's audio engine follows the Web Audio spec, so the same
+             drone and the same measurement work here unchanged. -->
+        <figure class="instrument">
+          <figcaption class="tag">Try it — this is the tuner</figcaption>
+
+          <div class="readout" id="readout" data-grade="idle" aria-live="polite">
+            <span class="readout-idle">Nothing playing yet</span>
+            <span class="readout-note" id="note"></span>
+            <span class="readout-cents" id="cents"></span>
+            <span class="readout-hz" id="hz"></span>
+          </div>
+
+          <div class="scale">
+            <svg id="scale" viewBox="0 0 500 104" aria-hidden="true" role="presentation">
+              <!-- ±5 cents: the app's "in tune" band, at 4.5px per cent -->
+              <rect class="band" x="227.5" y="8" width="45" height="88" rx="3" />
+              <g id="ticks"></g>
+              <line class="needle" id="needle" x1="250" y1="4" x2="250" y2="100" />
+            </svg>
+            <div class="scale-labels">
+              <span>−50</span><span>0</span><span>+50</span>
+            </div>
+          </div>
+
+          <div class="instrument-controls">
+            <button class="chip" id="drone" type="button" aria-pressed="false">
+              Play the A drone
+            </button>
+            <button class="chip" id="mic" type="button" aria-pressed="false">
+              Use my microphone
+            </button>
+          </div>
+          <p class="instrument-status" id="status">
+            Play the drone to tune against, or turn on the microphone to read what you
+            are playing.
+          </p>
+        </figure>
+      </header>
+    </div>
+
+    <main>
+      <section class="section" id="tools">
+        <div class="wrap">
+          <p class="tag">What is in it</p>
+          <h2>Six tools that already know what A you tuned to.</h2>
+          <p class="section-lead">
+            Set the reference pitch once — anywhere from Baroque 415 to a sharp 444 — and
+            the drone, tuner, scales and trainer all follow it. The drone and the
+            metronome run at the same time, because that is how you actually practise.
+          </p>
+
+          <div class="tools">
+            <article class="tool">
+              <p class="tag">12 roots · octaves 2–5</p>
+              <h3>Drone</h3>
+              <p>
+                A soft bowed-string timbre with a slow breathing swell, optional perfect
+                fifth, and one-tap open strings. Keeps sounding with the screen locked.
+              </p>
+            </article>
+
+            <article class="tool">
+              <p class="tag">A = 415–444 Hz</p>
+              <h3>Tuner</h3>
+              <p>
+                Reads the note you are playing and lets the needle settle instead of
+                twitching at every bow wobble. Equal temperament, or just intonation
+                measured against the drone.
+              </p>
+            </article>
+
+            <article class="tool">
+              <p class="tag">30–240 BPM</p>
+              <h3>Metronome</h3>
+              <p>
+                Dead on the beat however long you leave it running — no creeping drift.
+                Tap tempo, time signatures, subdivisions and accented downbeats.
+              </p>
+            </article>
+
+            <article class="tool">
+              <p class="tag">6 scale types</p>
+              <h3>Scales</h3>
+              <p>
+                Major, three minors and both arpeggios, in every key across two octaves.
+                The note you are playing lights up as you play it, with the tonic drone
+                one tap away.
+              </p>
+            </article>
+
+            <article class="tool">
+              <p class="tag">10 notes · scored in ¢</p>
+              <h3>Intonation trainer</h3>
+              <p>
+                Ten target notes per session. Hold each one steady for a second and get
+                graded on accuracy and steadiness — open strings, first position, or the
+                whole fingerboard.
+              </p>
+            </article>
+
+            <article class="tool">
+              <p class="tag">Logged automatically</p>
+              <h3>Practice journal</h3>
+              <p>
+                Time per tool, day streak, intonation trend and the notes you keep missing
+                — recorded as you practise. Nothing to fill in afterwards.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="wrap">
+          <p class="tag">The part other tuners skip</p>
+          <h2>A number for how in tune you actually were.</h2>
+          <p class="section-lead">
+            A tuner tells you about the note you are playing right now. It cannot tell you
+            that your F♯ has been eight cents flat all week. The trainer gives you ten
+            targets, measures each one against the reference you chose, and keeps the
+            result — so the pattern shows up in the journal instead of in a lesson.
+          </p>
+
+          <div class="grades">
+            <div class="grade grade-true">
+              <div class="grade-value">0–5¢</div>
+              <p>Indistinguishable from in tune. This is the target.</p>
+            </div>
+            <div class="grade grade-near">
+              <div class="grade-value">5–15¢</div>
+              <p>Audible to a trained ear, especially against a drone.</p>
+            </div>
+            <div class="grade grade-off">
+              <div class="grade-value">15¢+</div>
+              <p>Clearly off. Worth stopping and re-placing the finger.</p>
+            </div>
+          </div>
+
+          <div class="screens">
+            <figure class="screen">
+              <img
+                src="shots/intonation.png"
+                alt="Intonation trainer screen with difficulty options: open strings, first position, all positions."
+                loading="lazy"
+                width="600"
+                height="1267"
+              />
+              <figcaption>Pick a difficulty, get ten notes</figcaption>
+            </figure>
+            <figure class="screen">
+              <img
+                src="shots/tuner.png"
+                alt="Tuner screen showing a cents scale from minus fifty to plus fifty with a green in-tune band, and open string buttons G D A E."
+                loading="lazy"
+                width="600"
+                height="1267"
+              />
+              <figcaption>The same scale, live</figcaption>
+            </figure>
+            <figure class="screen">
+              <img
+                src="shots/home.png"
+                alt="Home screen showing a four day streak, two hours eight minutes practised this week, an average of plus or minus four cents, and trouble notes E, D and G."
+                loading="lazy"
+                width="600"
+                height="1267"
+              />
+              <figcaption>It adds up in the journal</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="wrap split">
+          <div>
+            <p class="tag">Practice journal</p>
+            <h2>Written while you practise, not afterwards.</h2>
+            <p class="section-lead">
+              Every tool logs its own time. The home screen shows the streak, the week
+              broken down by tool, the latest intonation score and the pitches you keep
+              missing. There is no form to fill in and nothing to remember to start.
+            </p>
+          </div>
+          <figure class="screen">
+            <img
+              src="shots/journal.png"
+              alt="Practice journal screen listing recent sessions by tool and date."
+              loading="lazy"
+              width="600"
+              height="1267"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="open">
+        <div class="wrap">
+          <p class="tag">Private and open</p>
+          <h2>The microphone never leaves the room.</h2>
+          <p class="section-lead">
+            A practice app listens to you for hours. This one does all of it on the
+            device, and you can check that claim yourself — the source is public.
+          </p>
+
+          <ul class="facts">
+            <li>
+              <h3>Nothing is recorded</h3>
+              <p>
+                Microphone audio is analysed in memory to find the pitch and then
+                discarded. It is never written to disk or sent anywhere.
+              </p>
+            </li>
+            <li>
+              <h3>No account, nothing to sync</h3>
+              <p>
+                Nothing to sign in to, and your practice history stays on your phone. The
+                only thing the app ever sends is a check for
+                <a href="privacy.html">a new version</a>.
+              </p>
+            </li>
+            <li>
+              <h3>No analytics, no ads</h3>
+              <p>
+                Nothing tracks which tools you use or how long you practise, except the
+                journal on your own device.
+              </p>
+            </li>
+            <li>
+              <h3>AGPL-3.0</h3>
+              <p>
+                Free software. Read it, build it, change it, or fork it — see the
+                <a href="https://github.com/simoneb/violin-skills">repository</a>.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footer-links">
+          <a href="https://github.com/simoneb/violin-skills">Source</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="https://github.com/simoneb/violin-skills/issues">Report a bug</a>
+          <a href="https://github.com/simoneb/violin-skills/blob/main/LICENSE">License</a>
+        </div>
+        <p>
+          Violin Skills is free software under the GNU Affero General Public License v3.
+          The name and icon are not covered by that licence.
+        </p>
+      </div>
+    </footer>
+
+    <script src="tuner.js"></script>
+  </body>
+</html>

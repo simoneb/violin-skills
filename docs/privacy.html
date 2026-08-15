@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy policy — Violin Skills</title>
+    <meta
+      name="description"
+      content="Violin Skills privacy policy: microphone audio is analysed on the device and never recorded or transmitted."
+    />
+    <meta name="theme-color" content="#4F46E5" />
+    <link rel="icon" href="icon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Public+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="wrap">
+      <nav class="topbar">
+        <a class="brand" href="./">
+          <img src="icon.png" alt="" />
+          Violin Skills
+        </a>
+        <a href="https://github.com/simoneb/violin-skills">GitHub</a>
+      </nav>
+
+      <article class="prose">
+        <p class="tag updated">Last updated 15 August 2026</p>
+        <h1>Privacy policy</h1>
+
+        <p>
+          <strong
+            >Violin Skills does not collect, store or transmit anything about you.</strong
+          >
+          It has no accounts, no analytics and no advertising. Your microphone audio and
+          your practice history stay on your phone. This page explains that in detail,
+          including the one network request the app does make.
+        </p>
+
+        <h2>Microphone</h2>
+        <p>
+          The tuner, the scales screen and the intonation trainer need to hear you, so the
+          app asks for microphone permission the first time you open one of them.
+        </p>
+        <p>
+          Audio from the microphone is read into a short buffer in memory, analysed to
+          work out the pitch, and then overwritten by the next buffer.
+          <strong>It is never written to storage and never leaves your device.</strong>
+          The app keeps only the result of the analysis — a frequency in hertz — and even
+          that is discarded unless you are in an intonation session, where the resulting
+          score is saved.
+        </p>
+        <p>You can refuse or revoke the permission; the drone and metronome still work.</p>
+
+        <h2>What is stored on your device</h2>
+        <p>
+          The app keeps a private record on your phone of your practice sessions (which
+          tool, when, and for how long), your intonation results (the target note and how
+          far off you were, in cents), and your settings such as the reference pitch.
+        </p>
+        <p>
+          None of it is uploaded. Deleting the app deletes all of it. There is no backup
+          and no sync service.
+        </p>
+
+        <h2>The one network request</h2>
+        <p>
+          So that fixes can reach you without waiting for a store release, the app checks
+          for a newer version when it starts. That check goes to
+          <strong>https://u.expo.dev</strong>, a service run by Expo.
+        </p>
+        <p>
+          The check contains no personal data and nothing about your practice. As with any
+          request over the internet, the service does see your IP address and basic
+          details such as which version of the app you are running. Expo's handling of
+          that is covered by
+          <a href="https://expo.dev/privacy">Expo's privacy policy</a>.
+        </p>
+        <p>
+          Apart from update checks, and links you deliberately tap that open your browser,
+          the app makes no network requests at all.
+        </p>
+
+        <h2>Permissions, and why each one exists</h2>
+        <ul>
+          <li>
+            <strong>Microphone</strong> — pitch detection for the tuner, scales and
+            intonation trainer.
+          </li>
+          <li>
+            <strong>Foreground service &amp; media playback</strong> — lets the drone and
+            metronome keep sounding when the screen is locked, which is the whole point of
+            a practice drone.
+          </li>
+          <li>
+            <strong>Notifications</strong> — shows the playback control while audio is
+            running. The app sends no other notifications.
+          </li>
+        </ul>
+
+        <h2>No third parties</h2>
+        <p>
+          There is no analytics SDK, no crash reporter, no advertising network and no
+          social login. No third party receives data from this app, and nothing about you
+          is sold or shared, because nothing about you is collected.
+        </p>
+
+        <h2>Children</h2>
+        <p>
+          The app is suitable for all ages and collects no personal information from
+          anyone, including children.
+        </p>
+
+        <h2>Verifying any of this</h2>
+        <p>
+          You do not have to take this page's word for it. Violin Skills is free software
+          under the AGPL-3.0 and the complete source is at
+          <a href="https://github.com/simoneb/violin-skills">github.com/simoneb/violin-skills</a>.
+          Every claim above can be checked against the code, and you can build the app
+          yourself.
+        </p>
+
+        <h2>Changes</h2>
+        <p>
+          If this policy changes, the date at the top changes and the previous versions
+          remain in the repository's history.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Questions about privacy: open an issue at
+          <a href="https://github.com/simoneb/violin-skills/issues"
+            >github.com/simoneb/violin-skills/issues</a
+          >, or email
+          <a href="mailto:simone.busoli@gmail.com">simone.busoli@gmail.com</a>.
+        </p>
+      </article>
+    </div>
+
+    <footer class="footer">
+      <div class="wrap">
+        <div class="footer-links">
+          <a href="./">Home</a>
+          <a href="https://github.com/simoneb/violin-skills">Source</a>
+          <a href="https://github.com/simoneb/violin-skills/blob/main/LICENSE">License</a>
+        </div>
+        <p>Violin Skills — free software under the GNU Affero General Public License v3.</p>
+      </div>
+    </footer>
+  </body>
+</html>

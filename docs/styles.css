@@ -1,0 +1,632 @@
+/* Violin Skills — marketing site
+ *
+ * The palette is not a marketing palette: it is the app's own theme tokens
+ * (src/constants/theme.ts), including the three intonation colours the app
+ * uses to grade a note — in tune / slightly off / clearly off. The site is
+ * organised around the same measurement the app is about.
+ */
+
+:root {
+  --ink: #1a1d23;
+  --ink-2: #676d79;
+  --paper: #fafafc;
+  --surface: #f0f1f5;
+  --line: #e6e8ef;
+  --indigo: #4f46e5;
+  --indigo-ink: #ffffff;
+  --indigo-soft: #eceafd;
+  /* Sits one step above --surface, so controls read as raised on a panel. */
+  --raise: #ffffff;
+
+  /* Intonation grading, straight from the app */
+  --true: #1e8e3e;
+  --true-soft: #d9ecdf;
+  --near: #b8860b;
+  --off: #c5221f;
+
+  --display: 'Fraunces', Georgia, serif;
+  --body: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'DM Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --gutter: clamp(1.25rem, 5vw, 3rem);
+  --measure: 1100px;
+  --radius: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f2f3f5;
+    --ink-2: #9ba1ab;
+    --paper: #0b0d10;
+    --surface: #171a1f;
+    --line: #22262e;
+    --indigo: #8b93f8;
+    --indigo-ink: #0b0d10;
+    --indigo-soft: #1b1e33;
+    --raise: #252a32;
+    --true: #4ade80;
+    --true-soft: #12301f;
+    --near: #facc15;
+    --off: #f87171;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  /* 17px base — the app's own base size; this audience likes large UI. */
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.wrap {
+  width: 100%;
+  max-width: var(--measure);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Small caps-ish mono label. Used for anything that is a measurement or a
+   category — never as decoration. */
+.tag {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- topbar */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding-block: 1.25rem;
+}
+
+/* Four items only just fit a 500px viewport. On a real phone the section
+   anchors are the ones worth dropping — the repo link is not. */
+@media (max-width: 560px) {
+  .topbar a[href^='#'] {
+    display: none;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-right: auto;
+}
+
+.brand img {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+
+.topbar a:not(.brand) {
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--ink-2);
+}
+
+.topbar a:not(.brand):hover {
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ hero */
+
+.hero {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 4rem);
+  padding-block: clamp(2.5rem, 7vw, 5rem) clamp(3rem, 8vw, 6rem);
+  align-items: center;
+}
+
+@media (min-width: 940px) {
+  .hero {
+    grid-template-columns: 1fr 1.05fr;
+  }
+}
+
+.hero h1 {
+  font-size: clamp(2.9rem, 7.5vw, 4.75rem);
+  margin-block: 0.75rem 1.25rem;
+}
+
+.hero-lead {
+  font-size: 1.2rem;
+  color: var(--ink-2);
+  max-width: 34ch;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  color: var(--ink);
+}
+
+.btn-primary {
+  background: var(--indigo);
+  color: var(--indigo-ink);
+}
+
+.btn-quiet {
+  border-color: var(--line);
+  background: var(--surface);
+}
+
+.btn:hover {
+  filter: brightness(1.06);
+}
+
+.cta-note {
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------- the instrument (hero) */
+
+.instrument {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
+  min-height: 4.5rem;
+}
+
+.readout-note {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  font-size: 3.5rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.readout-cents {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.readout-hz {
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Grade the readout the way the app grades a note. */
+.readout[data-grade='true'] .readout-cents {
+  color: var(--true);
+}
+.readout[data-grade='near'] .readout-cents {
+  color: var(--near);
+}
+.readout[data-grade='off'] .readout-cents {
+  color: var(--off);
+}
+/* Idle is its own state, not a dimmed reading. */
+.readout-idle {
+  display: none;
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  align-self: center;
+}
+
+.readout[data-grade='idle'] .readout-idle {
+  display: block;
+}
+
+.readout[data-grade='idle'] .readout-note,
+.readout[data-grade='idle'] .readout-cents,
+.readout[data-grade='idle'] .readout-hz {
+  display: none;
+}
+
+.scale {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.scale svg {
+  display: block;
+  width: 100%;
+  height: 104px;
+  overflow: visible;
+}
+
+.tick {
+  stroke: var(--ink-2);
+  opacity: 0.5;
+}
+
+.tick-major {
+  stroke: var(--ink-2);
+  opacity: 0.85;
+  stroke-width: 1.5;
+}
+
+.band {
+  fill: var(--true-soft);
+}
+
+.needle {
+  stroke: var(--ink);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: transform 90ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .needle {
+    transition: none;
+  }
+}
+
+.scale-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ink-2);
+  margin-top: 0.35rem;
+}
+
+.instrument-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.chip {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--raise);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: var(--indigo-ink);
+}
+
+.instrument-status {
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  min-height: 1.4em;
+}
+
+/* --------------------------------------------------------------- section */
+
+.section {
+  padding-block: clamp(3.5rem, 9vw, 6.5rem);
+  border-top: 1px solid var(--line);
+}
+
+.section h2 {
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  margin-block: 0.6rem 1rem;
+  max-width: 20ch;
+}
+
+.section-lead {
+  color: var(--ink-2);
+  max-width: 58ch;
+  font-size: 1.1rem;
+}
+
+/* ----------------------------------------------------------------- tools */
+
+.tools {
+  display: grid;
+  gap: 1px;
+  margin-top: 3rem;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 700px) {
+  .tools {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1000px) {
+  .tools {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.tool {
+  background: var(--paper);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tool h3 {
+  font-size: 1.4rem;
+}
+
+.tool p {
+  color: var(--ink-2);
+  font-size: 0.98rem;
+}
+
+/* The spec line is the point: each tool is defined by a real number. */
+.tool .tag {
+  color: var(--indigo);
+}
+
+/* --------------------------------------------------------------- screens */
+
+.screens {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  margin-top: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.screen figcaption {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--ink-2);
+  margin-top: 0.9rem;
+  text-align: center;
+}
+
+/* Phone captures are 600×1267. Left to fill their column they tower over the
+   text beside them, so height leads and width follows. */
+.screen img {
+  width: auto;
+  max-width: 100%;
+  max-height: 600px;
+  margin-inline: auto;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.split .screen img {
+  max-height: 440px;
+}
+
+/* --------------------------------------------------------------- grading */
+
+.grades {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.grade {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  background: var(--surface);
+}
+
+.grade-value {
+  font-family: var(--mono);
+  font-size: 1.6rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.grade p {
+  color: var(--ink-2);
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+}
+
+.grade-true .grade-value {
+  color: var(--true);
+}
+.grade-near .grade-value {
+  color: var(--near);
+}
+.grade-off .grade-value {
+  color: var(--off);
+}
+
+/* --------------------------------------------------------------- two-col */
+
+.split {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .split {
+    grid-template-columns: 1fr 320px;
+  }
+}
+
+/* ----------------------------------------------------------------- facts */
+
+.facts {
+  list-style: none;
+  padding: 0;
+  margin: 2.5rem 0 0;
+  display: grid;
+  gap: 2rem 2.5rem;
+  /* Four facts: 320px settles into a 2×2 block rather than 3 across with an
+     orphan on the second row. */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.facts h3 {
+  font-size: 1.15rem;
+  font-family: var(--body);
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-bottom: 0.3rem;
+}
+
+.facts p {
+  color: var(--ink-2);
+  font-size: 0.98rem;
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.footer {
+  border-top: 1px solid var(--line);
+  padding-block: 3rem 4rem;
+  color: var(--ink-2);
+  font-size: 0.95rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.footer a {
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ prose */
+
+.prose {
+  max-width: 68ch;
+  padding-block: clamp(2rem, 6vw, 4rem) 5rem;
+}
+
+.prose h1 {
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  margin-bottom: 1rem;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  margin-top: 2.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.prose p,
+.prose li {
+  color: var(--ink-2);
+  margin-bottom: 1rem;
+}
+
+.prose strong {
+  color: var(--ink);
+}
+
+.prose ul {
+  padding-left: 1.2rem;
+}
+
+.prose .updated {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
