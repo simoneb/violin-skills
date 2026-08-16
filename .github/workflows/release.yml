@@ -190,6 +190,13 @@ jobs:
           url=$(python3 -c "import json;print(json.load(open('build.json'))[0]['artifacts']['applicationArchiveUrl'])")
           mkdir -p release-assets
           curl -fsSL "$url" -o "release-assets/violin-skills-$VERSION.apk"
+
+          # The same binary again under a name with no version in it. GitHub
+          # serves /releases/latest/download/<filename>, which only works if the
+          # filename is stable, and that redirect is what the website links to —
+          # so the download link stays correct without the release having to
+          # reach over and edit the site.
+          cp "release-assets/violin-skills-$VERSION.apk" release-assets/violin-skills.apk
           ls -lh release-assets
 
       - uses: actions/upload-artifact@v7
@@ -233,6 +240,8 @@ jobs:
             echo "## Install"
             echo
             echo "Download \`violin-skills-$VERSION.apk\` and open it on your phone."
+            echo "(\`violin-skills.apk\` is the same binary under a fixed name, which is"
+            echo "what the website's download link points at.)"
             echo "Android will ask once for permission to install apps from your browser"
             echo "or file manager — this app is not on Google Play yet, so there is no"
             echo "store to vouch for it."
