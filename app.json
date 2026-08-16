@@ -67,7 +67,7 @@
     },
     "owner": "simoneb",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "fingerprint"
     },
     "updates": {
       "url": "https://u.expo.dev/31969e3f-df2e-457f-a221-48ad4c0f0f53"

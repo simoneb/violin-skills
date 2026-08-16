@@ -45,6 +45,7 @@
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
+    "cross-env": "^10.1.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~57.0.1",
     "jest": "~29.7.0",
@@ -56,6 +57,8 @@
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
+    "start:dev": "cross-env APP_VARIANT=development expo start",
+    "android:dev": "cross-env APP_VARIANT=development expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
