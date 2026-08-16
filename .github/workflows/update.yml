@@ -1,0 +1,115 @@
+name: Update
+
+# Ships JavaScript, TypeScript and asset changes to phones that already have
+# the app, without anyone downloading a 150 MB APK again. Actions > Update >
+# Run workflow, or `gh workflow run update.yml -f channel=production`.
+#
+# You do not have to work out whether a change is shippable this way. The guard
+# job below decides: it compares a fingerprint of the current native project
+# against the build people actually installed, and refuses to publish when they
+# differ. That matters because a mismatched update is not a loud failure — it
+# publishes to a runtime version no build declares, reaches nobody, and looks
+# exactly like success.
+#
+# When the guard stops you, the change touches native code: cut a release
+# instead (Actions > Release), which builds a new binary.
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Which channel to publish to
+        type: choice
+        options: [production, preview]
+        default: production
+      message:
+        description: What this update changes (shown in the EAS dashboard)
+        type: string
+
+# Two updates racing on the same channel would leave it ambiguous which one won.
+concurrency:
+  group: update-${{ inputs.channel }}
+  cancel-in-progress: false
+
+jobs:
+  # An update goes straight to people's phones with no store review in between,
+  # so the tests matter more here than they do for a build.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22.x
+      # See ci.yml: the lockfile needs npm 11, Node 22 ships npm 10.
+      - run: npm i -g npm@11.6.2
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 22.x
+      - run: npm i -g npm@11.6.2
+      - run: npm ci
+
+      # The comparison is against the newest finished build on this channel,
+      # which is the binary its users are running.
+      - name: Refuse to publish an update no build can receive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          npx eas-cli build:list \
+            --platform android \
+            --status finished \
+            --channel "$CHANNEL" \
+            --limit 1 \
+            --json \
+            --non-interactive > builds.json
+
+          if [ "$(python3 -c "import json;print(len(json.load(open('builds.json'))))")" = "0" ]; then
+            echo "::error::No finished Android build on the '$CHANNEL' channel, so there is nothing to update. Cut a release first."
+            exit 1
+          fi
+
+          build_id=$(python3 -c "import json;print(json.load(open('builds.json'))[0]['id'])")
+          echo "Comparing against build $build_id"
+
+          npx eas-cli fingerprint:compare \
+            --build-id "$build_id" \
+            --json \
+            --non-interactive > compare.json
+
+          python3 - <<'PY'
+          import json
+          c = json.load(open("compare.json"))
+          a, b = c["fingerprint1"]["hash"], c["fingerprint2"]["hash"]
+          if a == b:
+              print(f"Fingerprints match ({a[:12]}) — this update will reach the installed build.")
+              raise SystemExit(0)
+          print(f"::error::Native fingerprint changed ({a[:12]} vs {b[:12]}). "
+                "An update published now would target a runtime version no installed build "
+                "declares, so it would silently reach nobody. Cut a release instead: "
+                "Actions > Release > Run workflow.")
+          raise SystemExit(1)
+          PY
+
+      - name: Publish the update
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          CHANNEL: ${{ inputs.channel }}
+          MESSAGE: ${{ inputs.message }}
+        run: |
+          set -euo pipefail
+          message=${MESSAGE:-"$(git log -1 --pretty=%s)"}
+          npx eas-cli update \
+            --channel "$CHANNEL" \
+            --message "$message" \
+            --non-interactive
